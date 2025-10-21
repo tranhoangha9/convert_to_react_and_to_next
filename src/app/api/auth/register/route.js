@@ -7,7 +7,6 @@ export async function POST(request) {
   try {
     const { name, email, password } = await request.json();
 
-    // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
         { success: false, error: 'Vui lòng nhập đầy đủ thông tin' },
@@ -22,7 +21,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -34,18 +32,16 @@ export async function POST(request) {
       );
     }
 
-    // Create user without hashing password
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password: password, // Lưu trực tiếp không hash
+        password: password,
         role: 'user',
         isActive: true
       }
     });
 
-    // Create empty cart for user
     await prisma.cart.create({
       data: {
         userId: user.id

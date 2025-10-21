@@ -1,11 +1,3 @@
-/* Admin Layout */
-.admin-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: #f5f7fa;
-}
-
 .admin-container {
   display: flex;
   min-height: 100vh;
@@ -66,7 +58,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
 }
 
 .admin-header h1 {
@@ -146,105 +137,10 @@
   cursor: pointer;
 }
 
-/* ===== COMMON BUTTON STYLES ===== */
-
-.btn-primary,
-.admin-btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn-primary:hover,
-.admin-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-/* Secondary Button - for cancel actions */
-.btn-secondary,
-.admin-btn-secondary {
-  background: transparent;
-  color: #64748b;
-  border: 2px solid #e2e8f0;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover,
-.admin-btn-secondary:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-
-/* Small Button - for table actions */
-.btn-small {
-  padding: 6px 12px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #475569;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-small:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-/* Button Variants */
-.btn-view { background: #3b82f6; color: white; border-color: #3b82f6; }
-.btn-edit { background: #f59e0b; color: white; border-color: #f59e0b; }
-.btn-delete { background: #ef4444; color: white; border-color: #ef4444; }
-
-/* Pagination Button */
-.btn-pagination {
-  padding: 8px 16px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #475569;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-pagination:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.btn-pagination.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-
-.user-actions,
-.order-actions,
-.product-actions {
+.form-actions {
   display: flex;
-  gap: 8px;
-}
-
-.user-actions button,
-.order-actions button,
-.product-actions button {
-  margin-right: 0;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .admin-btn-primary {
@@ -371,17 +267,55 @@
   }
 }
 
-.admin-nav-bottom {
-  margin-top: auto;
-  border-top: 1px solid #334155;
-  padding-top: 20px;
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 16px;
 }
 
-.admin-nav-bottom .admin-nav-item {
-  color: #ef4444;
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 14px;
 }
 
-.admin-nav-bottom .admin-nav-item:hover {
-  background: #7f1d1d;
-  color: white;
+.active-product {
+  opacity: 1;
+}
+
+.inactive-product {
+  opacity: 0.6;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+
+.admin-card-with-margin {
+  margin-top: 30px;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
 }

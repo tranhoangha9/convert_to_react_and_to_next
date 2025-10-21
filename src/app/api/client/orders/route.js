@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+import { prisma } from '../../../../lib/prisma';
 
 export async function POST(request) {
   try {
@@ -45,7 +45,7 @@ export async function POST(request) {
     if (discount && discount > 0) {
       const discountRecord = await prisma.discount.findFirst({
         where: {
-          code: discountCode || 'giamgia', // Sử dụng code từ frontend hoặc mặc định
+          code: discountCode || 'giamgia', 
           isActive: true
         }
       });

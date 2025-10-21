@@ -143,19 +143,9 @@ class CartModal extends Component {
                             <button type="submit" aria-label="Apply coupon code">Apply</button>
                         </form>
 
-                        <form onSubmit={this.handleCouponSubmit} className="coupon-form">
-                            <input
-                                type="text"
-                                placeholder="Apply Coupon Code"
-                                value={this.state.couponCode}
-                                onChange={(e) => this.setState({ couponCode: e.target.value })}
-                            />
-                            <button type="submit" aria-label="Check coupon code">CHECK</button>
-                        </form>
-
                         <div className="cart-actions">
                             <Link 
-                                href="/cart"
+                                href="/client/cart"
                                 onClick={onClose}
                                 className="place-order-btn"
                                 aria-label="Proceed to checkout"

@@ -46,7 +46,7 @@ class Account extends Component {
     }
 
     try {
-      const response = await fetch(`/api/users/profile?userId=${user.id}`);
+      const response = await fetch(`/api/client/users/profile?userId=${user.id}`);
       const data = await response.json();
       
       if (data.success) {
@@ -126,7 +126,7 @@ class Account extends Component {
         avatar: profileImageUrl
       };
 
-      const response = await fetch('/api/users/profile', {
+      const response = await fetch('/api/client/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -9,7 +9,7 @@ class Notification extends Component {
         <div className="container">
           <marquee behavior="" direction=""> <p>
             We are currently experiencing local customs clearance delays. For the
-            latest updates, please check your order status <a href="#" style={{color: '#1B4B66'}} aria-label="Check order status">here</a>
+            latest updates, please check your order status <a href="#" className="order-status-link" aria-label="Check order status">here</a>
           </p> </marquee>
         </div>
       </section>

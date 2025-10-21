@@ -36,7 +36,7 @@ const clearLocalCart = () => {
 
 const getDbCart = async (userId) => {
   try {
-    const response = await fetch(`/api/cart?userId=${userId}`);
+    const response = await fetch(`/api/client/cart?userId=${userId}`);
 
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
@@ -65,7 +65,7 @@ const getDbCart = async (userId) => {
 
 const saveDbCart = async (userId, cartItems) => {
   try {
-    const response = await fetch('/api/cart', {
+    const response = await fetch('/api/client/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

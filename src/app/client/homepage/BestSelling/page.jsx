@@ -21,7 +21,7 @@ class BestSelling extends Component {
     try {
       this.setState({ loading: true, error: null });
 
-      const response = await fetch('/api/products?limit=4&page=1');
+      const response = await fetch('/api/client/products?limit=4&page=1');
       const data = await response.json();
 
       if (data.success) {

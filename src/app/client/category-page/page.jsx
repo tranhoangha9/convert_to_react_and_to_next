@@ -47,7 +47,7 @@ class CategoryPage extends Component {
     try {
       this.setState({ loading: true });
 
-      const response = await fetch(`/api/products?page=${page}&limit=9`);
+      const response = await fetch(`/api/client/products?page=${page}&limit=9`);
       const data = await response.json();
 
       if (data.success) {

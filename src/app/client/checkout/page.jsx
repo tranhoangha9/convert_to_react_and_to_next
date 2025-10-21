@@ -154,7 +154,7 @@ class Checkout extends Component {
         discountCode: discount && discount > 0 ? 'giamgia' : null
       };
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch('/api/client/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

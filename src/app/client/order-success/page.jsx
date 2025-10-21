@@ -24,7 +24,7 @@ class OrderSuccess extends Component {
 
   loadOrderDetails = async (orderId) => {
     try {
-      const response = await fetch(`/api/orders/[id]?orderId=${orderId}`);
+      const response = await fetch(`/api/client/orders/[id]?orderId=${orderId}`);
       const data = await response.json();
 
       if (data.success) {
