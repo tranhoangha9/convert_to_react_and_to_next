@@ -52,15 +52,6 @@ class Header extends Component {
           <div className="nav-logo">
             <Link href="/" aria-label="Go to homepage"><img src="/assets/images/logo.png" alt="Cora'l - Premium Handbags & Fashion Accessories" loading="lazy" /></Link>
           </div>
-          <input type="checkbox" className="search-toggle" id="search-toggle" />
-          <label htmlFor="search-toggle" className="search-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </label>
-          <div className="search-box">
-            <input type="text" placeholder="Search for products or brands..." />
-          </div>
           <input 
             type="checkbox" 
             className="menu-toggle" 
@@ -76,11 +67,11 @@ class Header extends Component {
           <nav className="nav-menu">
             <label htmlFor="menu-toggle" className="menu-close">×</label>
             <ul className="nav-menu-list">
-              <li><Link href="/client/category/handbags">Handbags</Link></li>
-              <li><Link href="/client/category/watches">Watches</Link></li>
-              <li><Link href="/client/category/skincare">Skincare</Link></li>
-              <li><Link href="/client/category/jewellery">Jewellery</Link></li>
-              <li><Link href="/client/category/apparels">Apparels</Link></li>
+              <li><Link href="/client/category-page">Handbags</Link></li>
+              <li><Link href="/client/category-page">Watches</Link></li>
+              <li><Link href="/client/category-page">Skincare</Link></li>
+              <li><Link href="/client/category-page">Jewellery</Link></li>
+              <li><Link href="/client/category-page">Apparels</Link></li>
             </ul>
             <div className="nav-icons">
               <Link href="#" aria-label="View wishlist">

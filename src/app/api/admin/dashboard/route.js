@@ -16,7 +16,6 @@ export async function GET(request){
       _sum: { totalAmount: true }
     });
     const totalRevenue = revenueResult._sum.totalAmount?.toNumber() || 0;
-
     const recentOrders = await prisma.order.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
@@ -28,7 +27,6 @@ export async function GET(request){
     });
 
     const topProducts = [];
-
     return Response.json({
       success: true,
       stats: {
