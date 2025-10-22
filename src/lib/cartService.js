@@ -45,7 +45,6 @@ const getDbCart = async (userId) => {
     }
 
     const data = await response.json();
-
     if (!response.ok) {
       console.error('API Error:', response.status, data);
       return [];

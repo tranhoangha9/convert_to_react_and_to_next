@@ -239,34 +239,6 @@
 .btn-edit { color: #f59e0b; border-color: #f59e0b; }
 .btn-delete { color: #ef4444; border-color: #ef4444; }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .admin-users {
-    padding: 16px;
-  }
-
-  .users-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filters {
-    justify-content: center;
-  }
-
-  .pagination {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .pagination-controls {
-    margin: 0;
-    justify-content: center;
-  }
-}
-
-/* ===== LOADING SPINNER ===== */
 .loading-spinner {
   display: flex;
   align-items: center;
@@ -545,45 +517,11 @@
   margin-top: 20px;
 }
 
-/* ===== RESPONSIVE MODAL ===== */
-@media (max-width: 768px) {
-  .users-tabs {
-    flex-direction: column;
-  }
-
-  .tab-button {
-    width: 100%;
-    text-align: center;
-  }
-
-  .user-form .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content {
-    margin: 10px;
-    max-height: 95vh;
-  }
-
-  .modal-header,
-  .user-form {
-    padding: 20px;
-  }
-
-  .status-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-/* ===== SPINNER ANIMATION ===== */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* ===== EMPTY STATE ===== */
 .empty-users-message {
   text-align: center;
   padding: 40px;

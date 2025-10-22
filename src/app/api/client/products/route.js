@@ -1,4 +1,4 @@
-import { prisma } from '../../../../lib/prisma';
+import prisma from '../../../../lib/prisma';
 
 /**
  * GET /api/products?page=1&limit=9&categoryId=1

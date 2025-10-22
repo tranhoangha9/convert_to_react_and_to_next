@@ -28,7 +28,7 @@ class AdminLogin extends Component {
     this.setState({ loading: true, error: '' });
     if (!username || !password) {
       this.setState({
-        error: 'Vui lòng nhập đầy đủ thông tin',
+        error: 'Please enter all required information',
         loading: false
       });
       return;
@@ -49,27 +49,27 @@ class AdminLogin extends Component {
       const data = await response.json();
 
       if (data.success) {
-        if (data.user.role !== 'admin') {
+        if (data.user.role !== 'admin' && data.user.role !== 'staff') {
           this.setState({
-            error: 'Bạn không có quyền truy cập admin panel',
+            error: 'You do not have permission to access admin panel',
             loading: false
           });
           return;
         }
 
-        localStorage.setItem('adminUser', JSON.stringify(data.user));
+        sessionStorage.setItem('adminUser', JSON.stringify(data.user));
 
         window.location.href = '/admin/dashboard';
       } else {
         this.setState({
-          error: data.error || 'Đăng nhập thất bại',
+          error: data.error || 'Login failed',
           loading: false
         });
       }
     } catch (error) {
       console.error('Login error:', error);
       this.setState({
-        error: 'Có lỗi xảy ra khi đăng nhập',
+        error: 'An error occurred during login',
         loading: false
       });
     }
@@ -82,7 +82,6 @@ class AdminLogin extends Component {
         <div className="admin-login-card">
           <div className="admin-login-header">
             <h1>Admin Login</h1>
-            <p>Đăng nhập vào hệ thống quản trị</p>
           </div>
 
           <form onSubmit={this.handleSubmit} className="admin-login-form">
@@ -94,20 +93,20 @@ class AdminLogin extends Component {
                 name="username"
                 value={username}
                 onChange={this.handleInputChange}
-                placeholder="Nhập email admin"
+                placeholder="Enter admin email"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Mật khẩu</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={this.handleInputChange}
-                placeholder="Nhập mật khẩu"
+                placeholder="Enter password"
                 required
               />
             </div>
@@ -123,16 +122,16 @@ class AdminLogin extends Component {
               className="admin-login-button"
               disabled={loading}
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
           <div className="admin-login-footer">
-            <p className="demo-info">
-              Demo: admin@example.com ||| password123
+            <p className="demo-info"> <br />
+              admin: tenoteciara@gmail.com || 123123
             </p>
             <p className="back-link">
-              <Link href="/client">← Quay lại trang chủ</Link>
+              <Link href="/">← Back to homepage</Link>
             </p>
           </div>
         </div>

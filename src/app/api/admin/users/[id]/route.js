@@ -1,7 +1,8 @@
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 export async function PUT(request, { params }) {
   try {
+    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
     const { id } = params
     const { name, email, role, isActive, phone, address } = await request.json()
 
@@ -14,6 +15,20 @@ export async function PUT(request, { params }) {
         success: false,
         error: 'User không tồn tại'
       }, { status: 404 })
+    }
+
+    if (adminUser.role === 'staff') {
+      return Response.json({
+        success: false,
+        error: 'Bạn không có quyền chỉnh sửa người dùng'
+      }, { status: 403 })
+    }
+
+    if (existingUser.role === 'admin' && adminUser.role !== 'admin') {
+      return Response.json({
+        success: false,
+        error: 'Bạn không có quyền sửa admin'
+      }, { status: 403 })
     }
 
     const updatedUser = await prisma.user.update({
@@ -55,6 +70,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
+    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
     const { id } = params
 
     const existingUser = await prisma.user.findUnique({
@@ -68,13 +84,27 @@ export async function DELETE(request, { params }) {
       }, { status: 404 })
     }
 
-    await prisma.user.delete({
-      where: { id: parseInt(id) }
+    if (adminUser.role === 'staff') {
+      return Response.json({
+        success: false,
+        error: 'Bạn không có quyền xóa người dùng'
+      }, { status: 403 })
+    }
+    if (existingUser.role === 'admin' || existingUser.role === 'staff') {
+      return Response.json({
+        success: false,
+        error: 'Không thể xóa admin hoặc staff'
+      }, { status: 403 })
+    }
+
+    await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { isActive: false }
     })
 
     return Response.json({
       success: true,
-      message: 'Xóa user thành công'
+      message: 'Đã tắt kích hoạt user'
     })
 
   } catch (error) {

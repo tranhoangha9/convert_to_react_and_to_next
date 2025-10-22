@@ -29,9 +29,17 @@ class Register extends Component {
 
     this.setState({ loading: true, error: '' });
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       this.setState({ 
         error: 'Vui lòng nhập đầy đủ thông tin',
+        loading: false 
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      this.setState({ 
+        error: 'Mật khẩu phải có ít nhất 6 ký tự',
         loading: false 
       });
       return;
@@ -45,9 +53,10 @@ class Register extends Component {
       return;
     }
 
-    if (password.length < 6) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       this.setState({ 
-        error: 'Mật khẩu phải có ít nhất 6 ký tự',
+        error: 'Email không hợp lệ',
         loading: false 
       });
       return;

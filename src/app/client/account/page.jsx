@@ -16,7 +16,10 @@ class Account extends Component {
       email: '',
       phone: '',
       dateOfBirth: '',
-      countryCode: ''
+      countryCode: '',
+      address: '',
+      newPassword: '',
+      confirmPassword: ''
     };
   }
 
@@ -29,6 +32,7 @@ class Account extends Component {
         lastName: savedProfile.lastName || '',
         email: savedProfile.email || '',
         phone: savedProfile.phone || '',
+        address: savedProfile.address || '',
         countryCode: savedProfile.countryCode || '',
         dateOfBirth: savedProfile.dateOfBirth || '',
         profileImageUrl: savedProfile.profileImageUrl || null
@@ -112,17 +116,53 @@ class Account extends Component {
 
   handleSaveProfile = async () => {
     try {
-      const { user, firstName, lastName, phone, address, profileImageUrl } = this.state;
+      const { user, firstName, lastName, phone, address, profileImageUrl, newPassword, confirmPassword } = this.state;
       
       if (!user) {
         this.setState({ error: 'Không tìm thấy thông tin user' });
         return;
       }
 
+      if (!firstName.trim() || !lastName.trim()) {
+        this.setState({ error: 'Họ và tên không được để trống' });
+        return;
+      }
+
+      const wantsToChangePassword = newPassword.trim() !== '' || confirmPassword.trim() !== '';
+      
+      if (wantsToChangePassword) {
+        if (newPassword !== confirmPassword) {
+          this.setState({ error: 'Mật khẩu xác nhận không khớp' });
+          return;
+        }
+        
+        if (newPassword.length < 6) {
+          this.setState({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
+          return;
+        }
+
+        const passwordResponse = await fetch('/api/client/users/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            newPassword: newPassword
+          })
+        });
+
+        const passwordData = await passwordResponse.json();
+        if (!passwordData.success) {
+          this.setState({ error: passwordData.error || 'Có lỗi xảy ra khi đổi mật khẩu' });
+          return;
+        }
+      }
+
       const updateData = {
-        name: `${firstName} ${lastName}`.trim(),
-        phone: phone,
-        address: address,
+        name: `${firstName.trim()} ${lastName.trim()}`,
+        phone: phone.trim(),
+        address: address.trim(),
         avatar: profileImageUrl
       };
 
@@ -146,10 +186,15 @@ class Account extends Component {
 
         this.setState({ 
           user: updatedUser,
-          error: ''
+          error: '',
+          newPassword: '',
+          confirmPassword: ''
         });
         
-        alert('Thông tin đã được lưu thành công!');
+        const message = wantsToChangePassword 
+          ? 'Thông tin và mật khẩu đã được cập nhật thành công!' 
+          : 'Thông tin đã được lưu thành công!';
+        alert(message);
       } else {
         this.setState({ error: data.error || 'Có lỗi xảy ra khi lưu thông tin' });
       }
@@ -161,8 +206,9 @@ class Account extends Component {
 
   handleInputChange = (e) => {  
     const { name, value } = e.target;
-    this.setState({ [name]: value });
+    this.setState({ [name]: value, error: '' });
   }
+
   handleDeleteProfile = () => {
     localStorage.removeItem('profileImage');
     const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
@@ -334,25 +380,32 @@ class Account extends Component {
 
           <div className="password-form">
             <div className="form-group">
-              <label>Current Password</label>
-              <input type="password" value="••••••••" readOnly />
-            </div>
-
-            <div className="form-group">
               <label>New Password</label>
-              <div className="password-input">
-                <input type="password" />
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
+              <input
+                type="password"
+                name="newPassword"
+                value={this.state.newPassword}
+                onChange={this.handleInputChange}
+                placeholder="Nhập mật khẩu mới (để trống nếu không đổi)"
+              />
             </div>
 
             <div className="form-group">
-              <label>Confirm Password</label>
-              <input type="password"/>
+              <label>Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={this.state.confirmPassword}
+                onChange={this.handleInputChange}
+                placeholder="Nhập lại mật khẩu mới"
+              />
             </div>
+
+            {this.state.error && (
+              <div className="error-message">
+                {this.state.error}
+              </div>
+            )}
           </div>
 
           <div className="save-section">

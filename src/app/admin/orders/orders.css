@@ -217,38 +217,6 @@
   cursor: not-allowed;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .admin-orders {
-    padding: 16px;
-  }
-
-  .orders-header {
-    padding: 20px;
-  }
-
-  .orders-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filters {
-    justify-content: center;
-  }
-
-  .pagination {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .pagination-controls {
-    margin: 0;
-    justify-content: center;
-  }
-}
-
-/* ===== LOADING SPINNER ===== */
 .loading-spinner {
   display: flex;
   align-items: center;
@@ -324,29 +292,4 @@
   flex: 1;
   margin-left: 260px;
   padding: 40px;
-}
-
-/* ===== RESPONSIVE SIDEBAR ===== */
-@media (max-width: 1024px) {
-  .admin-sidebar {
-    width: 220px;
-  }
-
-  .admin-content {
-    margin-left: 220px;
-    padding: 30px 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-  }
-
-  .admin-content {
-    margin-left: 0;
-    padding: 20px;
-  }
 }

@@ -7,9 +7,7 @@ class ClientWrapper extends Component {
   }
 
   componentDidMount() {
-    // Clear session khi app khởi tạo lần đầu
     if (typeof window !== 'undefined' && !sessionStorage.getItem('appStarted')) {
-      // Chỉ clear nếu không phải là reload trang
       const isReload = performance.getEntriesByType('navigation')[0]?.type === 'reload';
       if (!isReload) {
         localStorage.removeItem('user');

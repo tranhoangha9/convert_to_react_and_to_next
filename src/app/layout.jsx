@@ -1,7 +1,6 @@
 import React from 'react';
+import ConditionalLayout from '../components/ConditionalLayout';
 import ClientWrapper from '../components/ClientWrapper';
-import Header from '../components/Header/page';
-import Footer from '../components/Footer/page';
 import '../styles/globals.css';
 import '../components/Header/Header.css';
 import '../components/Footer/Footer.css';
@@ -16,9 +15,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <ClientWrapper>
-          <Header />
-          {children}
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </ClientWrapper>
       </body>
     </html>

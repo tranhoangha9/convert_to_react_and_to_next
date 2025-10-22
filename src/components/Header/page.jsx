@@ -76,11 +76,11 @@ class Header extends Component {
           <nav className="nav-menu">
             <label htmlFor="menu-toggle" className="menu-close">×</label>
             <ul className="nav-menu-list">
-              <li><Link href="/client/category-page">Handbags</Link></li>
-              <li><Link href="#">Watches</Link></li>
-              <li><Link href="#">Skincare</Link></li>
-              <li><Link href="#">Jewellery</Link></li>
-              <li><Link href="#">Apparels</Link></li>
+              <li><Link href="/client/category/handbags">Handbags</Link></li>
+              <li><Link href="/client/category/watches">Watches</Link></li>
+              <li><Link href="/client/category/skincare">Skincare</Link></li>
+              <li><Link href="/client/category/jewellery">Jewellery</Link></li>
+              <li><Link href="/client/category/apparels">Apparels</Link></li>
             </ul>
             <div className="nav-icons">
               <Link href="#" aria-label="View wishlist">

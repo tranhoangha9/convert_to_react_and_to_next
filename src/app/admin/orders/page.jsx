@@ -1,7 +1,8 @@
 'use client';
 import React, { Component } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
-import '../admin.css';
+import AuthGuard from '../components/AuthGuard';
+import '../styles/admin.css';
 import './orders.css';
 
 class AdminOrders extends Component {
@@ -84,18 +85,21 @@ class AdminOrders extends Component {
 
     if (loading) {
       return (
-        <div className="admin-container">
-          <AdminSidebar currentPath="/admin/orders" />
-          <div className="admin-content">
-            <div className="loading-spinner">Loading orders...</div>
+        <AuthGuard>
+          <div className="admin-container">
+            <AdminSidebar currentPath="/admin/orders" />
+            <div className="admin-content">
+              <div className="loading-spinner">Loading orders...</div>
+            </div>
           </div>
-        </div>
+        </AuthGuard>
       );
     }
 
     return (
-      <div className="admin-container">
-        <AdminSidebar currentPath="/admin/orders" />
+      <AuthGuard>
+        <div className="admin-container">
+          <AdminSidebar currentPath="/admin/orders" />
         <div className="admin-content">
           <div className="orders-controls">
             <div className="orders-search-box">
@@ -128,8 +132,8 @@ class AdminOrders extends Component {
               <thead>
                 <tr>
                   <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Email</th>
+                  <th className="text-left">Customer</th>
+                  <th>Phone</th>
                   <th>Amount</th>
                   <th>Status</th>
                   <th>Date</th>
@@ -141,26 +145,26 @@ class AdminOrders extends Component {
               <tbody>
                 {orders.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="empty-orders-message">
-                      Chưa có đơn hàng nào
+                    <td colSpan="9" className="empty-orders-message">
+                      No orders found
                     </td>
                   </tr>
                 ) : (
                   orders.map(order => (
                     <tr key={order.id}>
-                      <td className="order-id">{order.id}</td>
-                      <td className="customer-name">{order.customer}</td>
-                      <td className="customer-email">{order.email}</td>
-                      <td className="order-amount">${order.amount}</td>
-                      <td>
+                      <td className="text-center">{order.id}</td>
+                      <td>{order.customer}</td>
+                      <td className="text-center">{order.phone}</td>
+                      <td className="text-center">${order.amount}</td>
+                      <td className="text-center">
                         <span className={`status-badge ${this.getStatusBadgeClass(order.status)}`}>
                           {order.status}
                         </span>
                       </td>
-                      <td className="order-date">{order.date}</td>
-                      <td className="order-items">{order.items}</td>
-                      <td className="payment-method">{order.paymentMethod}</td>
-                      <td className="order-actions">
+                      <td className="text-center">{order.date}</td>
+                      <td className="text-center">{order.items}</td>
+                      <td className="text-center">{order.paymentMethod}</td>
+                      <td className="text-center">
                         <button className="btn-small btn-view">View</button>
                       </td>
                     </tr>
@@ -203,7 +207,8 @@ class AdminOrders extends Component {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </AuthGuard>
     );
   }
 }

@@ -29,20 +29,40 @@ class ProductForm extends Component {
       if (this.props.editingProduct) {
         this.setState({
           formData: {
-            name: this.props.editingProduct.name,
-            price: this.props.editingProduct.price,
+            name: this.props.editingProduct.name || '',
+            price: this.props.editingProduct.price || '',
             originalPrice: this.props.editingProduct.originalPrice || '',
             description: this.props.editingProduct.description || '',
             shortDescription: this.props.editingProduct.shortDescription || '',
             image: this.props.editingProduct.image || '',
             sku: this.props.editingProduct.sku || '',
-            stock: this.props.editingProduct.stock,
+            stock: this.props.editingProduct.stock || 0,
             categoryId: this.props.editingProduct.categoryId || 1,
-            isActive: this.props.editingProduct.isActive,
-            isFeatured: this.props.editingProduct.isFeatured,
+            isActive: this.props.editingProduct.isActive !== undefined ? this.props.editingProduct.isActive : true,
+            isFeatured: this.props.editingProduct.isFeatured || false,
             imagePreview: this.props.editingProduct.image || ''
           }
         });
+      } else {
+        this.setState({
+          formData: {
+            name: '',
+            price: '',
+            originalPrice: '',
+            description: '',
+            shortDescription: '',
+            image: '',
+            sku: '',
+            stock: 0,
+            categoryId: 1,
+            isActive: true,
+            isFeatured: false,
+            imagePreview: ''
+          }
+        });
+        if (this.imageInputRef.current) {
+          this.imageInputRef.current.value = '';
+        }
       }
     }
   }
@@ -144,21 +164,21 @@ class ProductForm extends Component {
     const { formData } = this.state;
 
     return (
-      <div className="admin-card">
-        <h3>{this.props.editingProduct ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}</h3>
+      <div className="admin-card product-form-card">
+        <h3>{this.props.editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
         <form onSubmit={this.handleSubmit} className="admin-form">
           <div className="form-row">
             <div className="form-group">
-              <label>Danh mục</label>
+              <label>Category</label>
               <select
                 name="categoryId"
                 value={formData.categoryId || ''}
                 onChange={this.handleInputChange}
                 disabled={categories.length === 0}
               >
-                <option value="">Chọn danh mục</option>
+                <option value="">Select category</option>
                 {categories.length === 0 ? (
-                  <option value="" disabled>Không thể tải danh mục</option>
+                  <option value="" disabled>Cannot load categories</option>
                 ) : (
                   categories.map(category => (
                     <option key={category.id} value={category.id}>
@@ -175,25 +195,25 @@ class ProductForm extends Component {
                 name="sku"
                 value={formData.sku}
                 onChange={this.handleInputChange}
-                placeholder="Nhập mã SKU"
+                placeholder="Enter SKU code"
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Tên sản phẩm *</label>
+              <label>Product Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={this.handleInputChange}
-                placeholder="Nhập tên sản phẩm"
+                placeholder="Enter product name"
                 required
               />
             </div>
             <div className="form-group">
-              <label>Giá *</label>
+              <label>Price *</label>
               <input
                 type="number"
                 name="price"
@@ -304,10 +324,7 @@ class ProductForm extends Component {
 
           <div className="form-actions">
             <button type="submit" className="admin-btn-primary" disabled={loading}>
-              {loading ? 'Đang lưu...' : 'Lưu sản phẩm'}
-            </button>
-            <button type="button" className="admin-btn-secondary" onClick={this.handleCancel}>
-              Hủy
+              {loading ? 'Saving...' : (this.props.editingProduct ? 'Update Product' : 'Save Product')}
             </button>
           </div>
         </form>

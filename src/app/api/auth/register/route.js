@@ -14,6 +14,14 @@ export async function POST(request) {
       );
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, error: 'Email không hợp lệ' },
+        { status: 400 }
+      );
+    }
+
     if (password.length < 6) {
       return NextResponse.json(
         { success: false, error: 'Mật khẩu phải có ít nhất 6 ký tự' },

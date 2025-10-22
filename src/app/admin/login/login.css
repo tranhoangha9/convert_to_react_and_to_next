@@ -124,14 +124,3 @@
 .back-link a:hover {
   color: #5a67d8;
 }
-
-/* Responsive */
-@media (max-width: 480px) {
-  .admin-login-card {
-    padding: 30px 20px;
-  }
-
-  .admin-login-header h1 {
-    font-size: 24px;
-  }
-}

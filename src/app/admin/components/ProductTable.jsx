@@ -6,14 +6,14 @@ class ProductTable extends Component {
     const { products, loading, onEdit, onDelete, onActivate } = this.props;
 
     if (loading) {
-      return <div className="loading-message">Đang tải...</div>;
+      return <div className="loading-message">Loading...</div>;
     }
 
     if (products.length === 0) {
       return (
         <tr>
           <td colSpan="7" className="empty-message">
-            Chưa có sản phẩm nào
+            No products found
           </td>
         </tr>
       );
@@ -23,41 +23,41 @@ class ProductTable extends Component {
       <>
         {products.map(product => (
           <tr key={product.id} className={product.isActive ? 'active-product' : 'inactive-product'}>
-            <td>{product.id}</td>
-            <td>
+            <td className="text-center">{product.id}</td>
+            <td className="text-center">
               {product.image && (
                 <img src={product.image} alt={product.name} loading="lazy" />
               )}
             </td>
             <td>{product.name}</td>
-            <td>${parseFloat(product.price).toFixed(2)}</td>
-            <td>{product.stock}</td>
-            <td>
+            <td className="text-center">${parseFloat(product.price).toFixed(2)}</td>
+            <td className="text-center">{product.stock}</td>
+            <td className="text-center">
               <span className={`status-badge ${product.isActive ? 'status-active' : 'status-inactive'}`}>
-                {product.isActive ? 'Hoạt động' : 'Tắt kích hoạt'}
+                {product.isActive ? 'Active' : 'Inactive'}
               </span>
             </td>
-            <td>
+            <td className="text-center">
               <div className="product-actions">
                 <button
                   onClick={() => onEdit(product)}
                   className="btn-small btn-edit"
                 >
-                  Sửa
+                  Edit
                 </button>
                 {product.isActive ? (
                   <button
                     onClick={() => onDelete(product.id)}
                     className="btn-small btn-delete"
                   >
-                    Tắt kích hoạt
+                    Deactivate
                   </button>
                 ) : (
                   <button
                     onClick={() => onActivate(product.id)}
-                    className="btn-small btn-view"
+                    className="btn-small btn-activate"
                   >
-                    Kích hoạt lại
+                    Activate
                   </button>
                 )}
               </div>

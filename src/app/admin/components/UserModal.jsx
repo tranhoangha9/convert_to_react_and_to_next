@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../styles/admin.css';
 
 class UserModal extends Component {
   constructor(props) {
@@ -9,7 +10,6 @@ class UserModal extends Component {
       email: '',
       password: '',
       role: 'customer',
-      isActive: true,
       phone: '',
       address: ''
     };
@@ -19,7 +19,6 @@ class UserModal extends Component {
       email: props.user.email || '',
       password: props.user.password || '',
       role: props.user.role || 'customer',
-      isActive: props.user.isActive !== undefined ? props.user.isActive : true,
       phone: props.user.phone || '',
       address: props.user.address || ''
     } : {};
@@ -40,30 +39,61 @@ class UserModal extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!this.state.name || !this.state.email || (!this.props.user && !this.state.password)) {
-      alert('Vui lòng điền đầy đủ thông tin');
+    const { name, email, password, phone } = this.state;
+    const isEditing = this.props.user && this.props.user.id;
+
+    if (!name.trim()) {
+      alert('Vui lòng nhập tên');
+      return;
+    }
+
+    if (!email.trim()) {
+      alert('Vui lòng nhập email');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('Email không hợp lệ');
+      return;
+    }
+
+    if (!isEditing && !password) {
+      alert('Vui lòng nhập mật khẩu');
+      return;
+    }
+
+    if (!isEditing && password && password.length < 6) {
+      alert('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    if (phone && phone.trim() && !/^[0-9+\-\s()]+$/.test(phone.trim())) {
+      alert('Số điện thoại không hợp lệ');
       return;
     }
 
     try {
       const userData = {
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password,
+        name: name.trim(),
+        email: email.trim(),
+        password: password,
         role: this.state.role,
-        isActive: this.state.isActive,
-        phone: this.state.phone,
-        address: this.state.address
+        phone: this.state.phone.trim(),
+        address: this.state.address.trim()
       };
 
-      if (this.props.user) {
-        // Edit user - bỏ password nếu không thay đổi
+      if (isEditing) {
         delete userData.password;
       }
 
-      const response = await fetch(this.props.user ? `/api/admin/users/${this.props.user.id}` : '/api/admin/users', {
-        method: this.props.user ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+      const response = await fetch(isEditing ? `/api/admin/users/${this.props.user.id}` : '/api/admin/users', {
+        method: isEditing ? 'PUT' : 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-user': JSON.stringify(adminUser)
+        },
         body: JSON.stringify(userData)
       });
 
@@ -72,28 +102,31 @@ class UserModal extends Component {
       if (data.success) {
         this.props.onClose();
         this.props.onSuccess();
+        alert(isEditing ? 'Cập nhật người dùng thành công!' : 'Tạo người dùng thành công!');
       } else {
         alert(data.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
-      alert('Có lỗi xảy ra khi lưu');
+      alert('Lỗi khi lưu người dùng');
     }
   }
 
   render() {
     const { onClose, user, isEditable = true } = this.props;
+    const isViewOnly = user && user.id && user.role !== 'admin' && user.role !== 'staff';
+    const isStaffModal = user && (user.role === 'staff' || user.role === 'admin');
 
     return (
       <div className="modal-overlay">
         <div className="modal-content">
           <div className="modal-header">
             <h3>
-              {user ? 'View User' : 'Add New User'}
+              {user && user.id ? (user.role === 'staff' ? 'Edit Staff' : 'Edit User') : (user && user.role === 'staff' ? 'Add Staff' : 'Add New User')}
             </h3>
             <button className="modal-close" onClick={onClose}>×</button>
           </div>
 
-          <form className="user-form">
+          <form className="user-form" onSubmit={this.handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Name</label>
@@ -101,7 +134,8 @@ class UserModal extends Component {
                   type="text"
                   name="name"
                   value={this.state.name}
-                  disabled
+                  onChange={this.handleInputChange}
+                  required
                 />
               </div>
 
@@ -111,7 +145,8 @@ class UserModal extends Component {
                   type="email"
                   name="email"
                   value={this.state.email}
-                  disabled
+                  onChange={this.handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -122,8 +157,10 @@ class UserModal extends Component {
                 <input
                   type="password"
                   name="password"
-                  value={this.state.password}
-                  disabled
+                  value={user && user.id ? '••••••••' : this.state.password}
+                  onChange={this.handleInputChange}
+                  placeholder={user && user.id ? 'Leave blank to keep current' : 'Enter password'}
+                  disabled={user && user.id}
                 />
               </div>
 
@@ -132,11 +169,11 @@ class UserModal extends Component {
                 <select
                   name="role"
                   value={this.state.role}
-                  disabled
+                  onChange={this.handleInputChange}
                 >
-                  <option value="customer">Customer</option>
+                  <option value="user">User</option>
+                  <option value="staff">Staff</option>
                   <option value="admin">Admin</option>
-                  <option value="manager">Manager</option>
                 </select>
               </div>
             </div>
@@ -148,21 +185,9 @@ class UserModal extends Component {
                   type="tel"
                   name="phone"
                   value={this.state.phone}
-                  disabled
+                  onChange={this.handleInputChange}
+                  placeholder="Enter phone number"
                 />
-              </div>
-
-              <div className="form-group">
-                <label>Status</label>
-                <div className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={this.state.isActive}
-                    disabled
-                  />
-                  <span>Active</span>
-                </div>
               </div>
             </div>
 
@@ -172,13 +197,18 @@ class UserModal extends Component {
                 name="address"
                 value={this.state.address}
                 rows="3"
-                disabled
+                onChange={this.handleInputChange}
               />
             </div>
 
             <div className="modal-actions">
+              {!isViewOnly && (
+                <button type="submit" className="btn-primary">
+                  {user && user.id ? 'Update' : 'Create'}
+                </button>
+              )}
               <button type="button" className="btn-secondary" onClick={onClose}>
-                Close
+                {isViewOnly ? 'Close' : 'Cancel'}
               </button>
             </div>
           </form>

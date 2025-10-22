@@ -1,8 +1,10 @@
 'use client';
 import React, { Component } from 'react';
+import '../styles/admin.css';
 import AdminSidebar from '../components/AdminSidebar';
 import ProductForm from '../components/ProductForm';
 import ProductTable from '../components/ProductTable';
+import AuthGuard from '../components/AuthGuard';
 
 class AdminProducts extends Component {
     constructor(props) {
@@ -51,7 +53,7 @@ class AdminProducts extends Component {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      alert('Lỗi khi tải danh sách sản phẩm');
+      alert('Error loading products');
     } finally {
       this.setState({ loading: false });
     }
@@ -76,15 +78,15 @@ class AdminProducts extends Component {
       const data = await response.json();
 
       if (data.success) {
-        alert(data.message);
+        alert(data.message || 'Product saved successfully');
         this.setState({ showForm: false, editingProduct: null });
         await this.fetchProducts();
       } else {
-        alert(data.error);
+        alert(data.error || 'Error saving product');
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Lỗi khi lưu sản phẩm');
+      alert('Error saving product');
     } finally {
       this.setState({ loading: false });
     }
@@ -98,7 +100,7 @@ class AdminProducts extends Component {
   };
 
   handleDelete = async (id) => {
-    if (!confirm('Bạn có chắc muốn tắt kích hoạt sản phẩm này? Sản phẩm sẽ không hiển thị ở trang khách hàng nhưng vẫn có thể kích hoạt lại.')) return;
+    if (!confirm('Are you sure you want to deactivate this product?')) return;
 
     try {
       this.setState({ loading: true });
@@ -111,21 +113,21 @@ class AdminProducts extends Component {
       const data = await response.json();
 
       if (data.success) {
-        alert(data.message);
+        alert(data.message || 'Product deactivated successfully');
         await this.fetchProducts();
       } else {
-        alert(data.error);
+        alert(data.error || 'Error deactivating product');
       }
     } catch (error) {
       console.error('Error deactivating product:', error);
-      alert('Lỗi khi tắt kích hoạt sản phẩm');
+      alert('Error deactivating product');
     } finally {
       this.setState({ loading: false });
     }
   };
 
   handleActivate = async (id) => {
-    if (!confirm('Bạn có chắc muốn kích hoạt lại sản phẩm này?')) return;
+    if (!confirm('Are you sure you want to activate this product?')) return;
 
     try {
       this.setState({ loading: true });
@@ -137,14 +139,14 @@ class AdminProducts extends Component {
 
       const data = await response.json();
       if (data.success) {
-        alert(data.message);
+        alert(data.message || 'Product activated successfully');
         await this.fetchProducts();
       } else {
-        alert(data.error);
+        alert(data.error || 'Error activating product');
       }
     } catch (error) {
       console.error('Error activating product:', error);
-      alert('Lỗi khi kích hoạt sản phẩm');
+      alert('Error activating product');
     } finally {
       this.setState({ loading: false });
     }
@@ -164,17 +166,20 @@ class AdminProducts extends Component {
 
     if (loading && !showForm) {
       return (
-        <div className="admin-container">
-          <AdminSidebar currentPath="/admin/products" />
-          <div className="admin-content">
-            <div className="loading-spinner">Loading products...</div>
+        <AuthGuard>
+          <div className="admin-container">
+            <AdminSidebar currentPath="/admin/products" />
+            <div className="admin-content">
+              <div className="loading-spinner">Loading products...</div>
+            </div>
           </div>
-        </div>
+        </AuthGuard>
       );
     }
 
     return (
-      <div className="admin-container">
+      <AuthGuard>
+        <div className="admin-container">
         <AdminSidebar currentPath="/admin/products" />
         <div className="admin-content">
           {showForm && (
@@ -191,14 +196,14 @@ class AdminProducts extends Component {
 
           <div className="admin-card admin-card-with-margin">
             <div className="admin-card-header">
-              <h3>Danh sách sản phẩm</h3>
+              <h3>Products List</h3>
               {showForm ? (
                 <button className="btn-secondary" onClick={this.toggleForm}>
-                  Đóng form
+                  Close Form
                 </button>
               ) : (
                 <button className="admin-btn-primary" onClick={this.toggleForm}>
-                  Thêm sản phẩm mới
+                  Add Product
                 </button>
               )}
             </div>
@@ -206,12 +211,12 @@ class AdminProducts extends Component {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Hình ảnh</th>
-                  <th>Tên sản phẩm</th>
-                  <th>Giá</th>
-                  <th>Số lượng</th>
-                  <th>Trạng thái</th>
-                  <th>Hành động</th>
+                  <th>Image</th>
+                  <th className="text-left">Product Name</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -226,7 +231,8 @@ class AdminProducts extends Component {
             </table>
           </div>
         </div>
-      </div>
+        </div>
+      </AuthGuard>
     );
   }
 }

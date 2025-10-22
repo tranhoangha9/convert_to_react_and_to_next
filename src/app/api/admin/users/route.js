@@ -1,8 +1,16 @@
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 export async function POST(request) {
   try {
+    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
     const { name, email, password, role, isActive, phone, address } = await request.json()
+
+    if (adminUser.role === 'staff' && (role === 'admin' || role === 'staff')) {
+      return Response.json({
+        success: false,
+        error: 'Bạn không có quyền tạo tài khoản với role này'
+      }, { status: 403 })
+    }
 
     const existingUser = await prisma.user.findUnique({
       where: { email }

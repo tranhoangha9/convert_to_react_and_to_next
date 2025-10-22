@@ -1,7 +1,8 @@
 'use client';
 import React, { Component } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
-import '../admin.css';
+import AuthGuard from '../components/AuthGuard';
+import '../styles/admin.css';
 import './dashboard.css';
 
 class AdminDashboard extends Component {
@@ -21,6 +22,11 @@ class AdminDashboard extends Component {
   }
 
   async componentDidMount() {
+    const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+    if (adminUser.role === 'staff') {
+      window.location.href = '/admin/users';
+      return;
+    }
     await this.fetchDashboardData();
   }
 
@@ -59,18 +65,21 @@ class AdminDashboard extends Component {
 
     if (loading) {
       return (
-        <div className="admin-container">
-          <AdminSidebar currentPath="/admin/dashboard" />
-          <div className="admin-content">
-            <div className="loading-spinner">Loading dashboard...</div>
+        <AuthGuard>
+          <div className="admin-container">
+            <AdminSidebar currentPath="/admin/dashboard" />
+            <div className="admin-content">
+              <div className="loading-spinner">Loading dashboard...</div>
+            </div>
           </div>
-        </div>
+        </AuthGuard>
       );
     }
 
     return (
-      <div className="admin-container">
-        <AdminSidebar currentPath="/admin/dashboard" />
+      <AuthGuard>
+        <div className="admin-container">
+          <AdminSidebar currentPath="/admin/dashboard" />
         <div className="admin-content">
           <div className="stats-grid">
             <div className="stat-card">
@@ -174,7 +183,8 @@ class AdminDashboard extends Component {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </AuthGuard>
     );
   }
 }

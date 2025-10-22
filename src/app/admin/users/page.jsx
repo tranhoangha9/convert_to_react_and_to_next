@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import UserModal from '../components/UserModal';
-import '../admin.css';
+import AuthGuard from '../components/AuthGuard';
+import '../styles/admin.css';
 import './users.css';
 
 class AdminUsers extends Component {
@@ -51,20 +52,25 @@ class AdminUsers extends Component {
 
       let roleParam = this.state.roleFilter;
       if (this.state.activeTab === 'admins') {
-        roleParam = 'admin';
+        roleParam = 'all';
       } else if (this.state.activeTab === 'users') {
         roleParam = 'all';
       }
 
-      const response = await fetch(`/api/admin/users?page=${this.state.currentPage}&search=${this.state.searchTerm}&role=${roleParam}`);
+      const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+      const response = await fetch(`/api/admin/users?page=${this.state.currentPage}&search=${this.state.searchTerm}&role=${roleParam}`, {
+        headers: {
+          'x-admin-user': JSON.stringify(adminUser)
+        }
+      });
       const data = await response.json();
 
       if (data.success) {
         let filteredUsers = data.users;
         if (this.state.activeTab === 'users') {
-          filteredUsers = data.users.filter(user => user.role !== 'admin');
+          filteredUsers = data.users.filter(user => user.role !== 'admin' && user.role !== 'staff');
         } else if (this.state.activeTab === 'admins') {
-          filteredUsers = data.users.filter(user => user.role === 'admin');
+          filteredUsers = data.users.filter(user => user.role === 'admin' || user.role === 'staff');
         }
 
         this.setState({
@@ -75,7 +81,7 @@ class AdminUsers extends Component {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      alert('Lỗi khi tải danh sách người dùng');
+      alert('Error loading users');
       this.setState({ loading: false });
     }
   };
@@ -122,12 +128,23 @@ class AdminUsers extends Component {
     });
   };
 
+  handleAddStaff = () => {
+    this.setState({
+      showModal: true,
+      editingUser: { role: 'staff' }
+    });
+  };
+
   handleDeleteUser = async (userId) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa user này?')) return;
+    if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
+      const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'x-admin-user': JSON.stringify(adminUser)
+        }
       });
 
       const data = await response.json();
@@ -135,10 +152,10 @@ class AdminUsers extends Component {
       if (data.success) {
         this.fetchUsers();
       } else {
-        alert(data.error || 'Có lỗi xảy ra khi xóa user');
+        alert(data.error || 'Error deleting user');
       }
     } catch (error) {
-      alert('Có lỗi xảy ra khi xóa user');
+      alert('Error deleting user');
     }
   };
 
@@ -160,6 +177,7 @@ class AdminUsers extends Component {
   getRoleBadgeClass = (role) => {
     switch(role) {
       case 'admin': return 'role-admin';
+      case 'staff': return 'role-staff';
       case 'manager': return 'role-manager';
       case 'user':
       case 'customer': return 'role-customer';
@@ -176,19 +194,22 @@ class AdminUsers extends Component {
 
     if (loading) {
       return (
-        <div className="admin-container">
-          <AdminSidebar currentPath="/admin/users" />
-          <div className="admin-content">
-            <div className="loading-spinner">Loading users...</div>
+        <AuthGuard>
+          <div className="admin-container">
+            <AdminSidebar currentPath="/admin/users" />
+            <div className="admin-content">
+              <div className="loading-spinner">Loading users...</div>
+            </div>
           </div>
-        </div>
+        </AuthGuard>
       );
     }
 
     return (
-      <div className="admin-container">
-        <AdminSidebar currentPath="/admin/users" />
-        <div className="admin-content">
+      <AuthGuard>
+        <div className="admin-container">
+          <AdminSidebar currentPath="/admin/users" />
+          <div className="admin-content">
           <div className="admin-users">
             <div className="users-tabs">
               <button
@@ -221,13 +242,21 @@ class AdminUsers extends Component {
             </div>
 
             <div className="admin-card">
-              <h3>{activeTab === 'admins' ? 'Admins' : 'Users'} Management</h3>
+              <div className="admin-card-header">
+                <h3>{activeTab === 'admins' ? 'Admins & Staff' : 'Users'} Management</h3>
+                {activeTab === 'admins' && (
+                  <button className="admin-btn-primary" onClick={this.handleAddStaff}>
+                    Add Staff
+                  </button>
+                )}
+              </div>
               <table className="admin-table">
                 <thead>
                   <tr>
                     {activeTab !== 'admins' && <th>ID</th>}
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th className="text-left">Name</th>
+                    <th className="text-left">Email</th>
+                    {activeTab === 'admins' && <th>Role</th>}
                     <th>Status</th>
                     <th>Phone</th>
                     {activeTab === 'users' && <th>Orders</th>}
@@ -238,25 +267,34 @@ class AdminUsers extends Component {
                   {users.length === 0 ? (
                     <tr>
                       <td colSpan={activeTab === 'users' ? "8" : "7"} className="empty-users-message">
-                        Chưa có {activeTab === 'admins' ? 'admin' : 'user'} nào
+                        No {activeTab === 'admins' ? 'admins' : 'users'} found
                       </td>
                     </tr>
                   ) : (
                     users.map(user => (
                       <tr key={user.id}>
-                        {activeTab !== 'admins' && <td className="user-id">{user.id}</td>}
-                        <td className="user-name">{user.name}</td>
-                        <td className="user-email">{user.email}</td>
-                        <td>
+                        {activeTab !== 'admins' && <td className="text-center">{user.id}</td>}
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        {activeTab === 'admins' && (
+                          <td className="text-center">
+                            <span className={`role-badge ${this.getRoleBadgeClass(user.role)}`}>
+                              {user.role === 'admin' ? 'Admin' : 'Staff'}
+                            </span>
+                          </td>
+                        )}
+                        <td className="text-center">
                           <span className={`status-badge ${this.getStatusBadgeClass(user.status)}`}>
                             {user.status}
                           </span>
                         </td>
-                        <td className="user-join-date">{user.phone || 'N/A'}</td>
-                        {activeTab === 'users' && <td className="user-orders">{user.ordersCount || 0}</td>}
-                        <td className="user-actions">
+                        <td className="text-center">{user.phone || 'N/A'}</td>
+                        {activeTab === 'users' && <td className="text-center">{user.ordersCount || 0}</td>}
+                        <td className="text-center">
                           <button className="btn-small btn-view" onClick={() => this.handleEditUser(user)}>View</button>
-                          <button className="btn-small btn-delete" onClick={() => this.handleDeleteUser(user.id)}>Delete</button>
+                          {(activeTab === 'admins' || (activeTab === 'users' && user.status === 'active')) && (
+                            <button className="btn-small btn-delete" onClick={() => this.handleDeleteUser(user.id)}>Delete</button>
+                          )}
                         </td>
                       </tr>
                     ))
@@ -300,16 +338,17 @@ class AdminUsers extends Component {
               </div>
             )}
           </div>
-        </div>
+          </div>
 
-        {showModal && (
-          <UserModal
-            user={editingUser}
-            onClose={this.handleModalClose}
-            onSuccess={this.handleModalSuccess}
-          />
-        )}
-      </div>
+          {showModal && (
+            <UserModal
+              user={editingUser}
+              onClose={this.handleModalClose}
+              onSuccess={this.handleModalSuccess}
+            />
+          )}
+        </div>
+      </AuthGuard>
     );
   }
 }

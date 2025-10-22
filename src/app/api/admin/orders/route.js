@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 export async function GET(request) {
   try {
@@ -11,7 +11,6 @@ export async function GET(request) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause for Prisma
     let where = {};
     if (status !== 'all') {
       where.status = status;
@@ -29,7 +28,7 @@ export async function GET(request) {
       where,
       include: {
         user: {
-          select: { name: true, email: true }
+          select: { name: true, phone: true }
         },
         orderItems: {
           select: { quantity: true }
@@ -48,7 +47,7 @@ export async function GET(request) {
       orders: orders.map(order => ({
         id: `#${order.id.toString().padStart(3, '0')}`,
         customer: order.user?.name || 'N/A',
-        email: order.user?.email || 'N/A',
+        phone: order.user?.phone || 'N/A',
         status: order.status,
         amount: order.totalAmount.toNumber(),
         date: order.createdAt.toISOString().split('T')[0],
@@ -67,7 +66,7 @@ export async function GET(request) {
     console.error('Error fetching orders', error);
     return Response.json({
       success: false,
-      error: 'Lỗi khi tải danh sách đơn hàng'
+      error: 'Error loading orders'
     }, { status: 500 })
   }
 }
