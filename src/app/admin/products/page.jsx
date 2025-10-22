@@ -93,9 +93,10 @@ class AdminProducts extends Component {
   };
 
   handleEdit = (product) => {
-    this.setState({
-      editingProduct: product,
-      showForm: true
+    this.setState({ editingProduct: null, showForm: true }, () => {
+      setTimeout(() => {
+        this.setState({ editingProduct: product });
+      }, 0);
     });
   };
 
