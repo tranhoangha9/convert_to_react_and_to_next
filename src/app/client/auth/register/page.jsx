@@ -78,8 +78,8 @@ class Register extends Component {
       const data = await response.json();
 
       if (data.success) {
-        alert('Đăng ký thành công! Vui lòng đăng nhập.');
-        window.location.href = '/auth/login';
+        alert('Đăng ký thành công!');
+        window.location.href = '/client/auth/login';
       } else {
         this.setState({ 
           error: data.error || 'Đăng ký thất bại',
