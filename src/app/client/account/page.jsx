@@ -27,13 +27,14 @@ class Account extends Component {
     this.checkAuth();
     const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
     if (savedProfile) {
+      const detectedCode = savedProfile.phone ? this.detectCountryCode(savedProfile.phone) : (savedProfile.countryCode || '+84');
       this.setState({
         firstName: savedProfile.firstName || '',
         lastName: savedProfile.lastName || '',
         email: savedProfile.email || '',
         phone: savedProfile.phone || '',
         address: savedProfile.address || '',
-        countryCode: savedProfile.countryCode || '',
+        countryCode: detectedCode,
         dateOfBirth: savedProfile.dateOfBirth || '',
         profileImageUrl: savedProfile.profileImageUrl || null
       });
@@ -54,6 +55,7 @@ class Account extends Component {
       const data = await response.json();
       
       if (data.success) {
+        const detectedCode = data.user.phone ? this.detectCountryCode(data.user.phone) : (data.user.countryCode || '+84');
         this.setState({ 
           user: data.user,
           email: data.user.email,
@@ -61,7 +63,8 @@ class Account extends Component {
           lastName: data.user.name.split(' ').slice(1).join(' ') || '',
           phone: data.user.phone || '',
           address: data.user.address || '',
-          profileImageUrl: data.user.avatar || ''
+          profileImageUrl: data.user.avatar || '',
+          countryCode: detectedCode
         });
       } else {
         this.setState({ user: user });
@@ -380,7 +383,7 @@ class Account extends Component {
               <div className="form-group">
                 <label>Mobile Number</label>
                 <div className="phone-input">
-                  <input type="text" className="country-code" value={this.state.countryCode} onChange={this.handleInputChange} name='countryCode' />
+                  <input type="text" className="country-code" value={this.state.countryCode} name='countryCode' readOnly />
                   <input type="text" className="phone-number"  value={this.state.phone} onChange={this.handleInputChange} name="phone" />
                 </div>
               </div>
@@ -390,7 +393,7 @@ class Account extends Component {
               <div className="form-group">
                 <label>Date of birth</label>
                 <div className="date-input">
-                  <input type="date" value={this.state.dateOfBirth} onChange={this.handleInputChange} name="dateOfBirth"/>
+                  <input type="date" value={this.state.dateOfBirth} name="dateOfBirth" disabled />
                 </div>
               </div>
             </div>

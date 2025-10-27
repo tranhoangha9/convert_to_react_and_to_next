@@ -39,6 +39,13 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
+    if (user.role === 'admin') {
+      return Response.json({
+        success: false,
+        error: 'Admin accounts cannot log in via the client portal'
+      }, { status: 403 });
+    }
+
     if (user.password !== password) {
       return Response.json({
         success: false,
