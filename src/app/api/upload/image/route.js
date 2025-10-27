@@ -35,8 +35,12 @@ export async function POST(request) {
     const extension = path.extname(file.name);
     const filename = `${timestamp}_${Math.random().toString(36).substring(2)}${extension}`;
 
-    // Tạo thư mục uploads nếu chưa tồn tại
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    
+    const isProduction = process.env.NODE_ENV === 'production';
+    const uploadDir = isProduction 
+      ? '/var/www/nextapp/uploads'  
+      : path.join(process.cwd(), 'public', 'uploads'); 
+    
     await mkdir(uploadDir, { recursive: true });
 
     const filepath = path.join(uploadDir, filename);
