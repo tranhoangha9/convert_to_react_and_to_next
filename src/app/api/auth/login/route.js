@@ -40,10 +40,10 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
-    if (user.role === 'admin' && !isAdminPortal) {
+    if ((user.role === 'admin' || user.role === 'staff') && !isAdminPortal) {
       return Response.json({
         success: false,
-        error: 'Admin accounts cannot log in via the client portal'
+        error: 'Tài khoản quản trị không thể đăng nhập ở giao diện khách hàng'
       }, { status: 403 });
     }
 

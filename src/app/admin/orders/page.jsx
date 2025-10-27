@@ -13,6 +13,8 @@ class AdminOrders extends Component {
       loading: true,
       currentPage: 1,
       totalPages: 1,
+      hasNext: false,
+      hasPrev: false,
       searchTerm: '',
       statusFilter: 'all'
     };
@@ -35,15 +37,29 @@ class AdminOrders extends Component {
   fetchOrders = async () => {
     try {
       this.setState({ loading: true });
-      const response = await fetch(`/api/admin/orders?page=${this.state.currentPage}&search=${this.state.searchTerm}&status=${this.state.statusFilter}`);
+      const params = new URLSearchParams({
+        page: this.state.currentPage.toString(),
+        limit: '10',
+        search: this.state.searchTerm,
+        status: this.state.statusFilter
+      });
+      const response = await fetch(`/api/admin/orders?${params.toString()}`);
       const data = await response.json();
 
       if (data.success) {
+        const pagination = data.pagination || {};
+        const totalPages = Math.max(1, pagination.totalPages || 1);
+        const normalizedPage = Math.min(this.state.currentPage, totalPages);
         this.setState({
           orders: data.orders,
-          totalPages: data.totalPages,
+          totalPages,
+          currentPage: normalizedPage,
+          hasNext: pagination.hasNext ?? (normalizedPage < totalPages),
+          hasPrev: pagination.hasPrev ?? (normalizedPage > 1),
           loading: false
         });
+      } else {
+        this.setState({ loading: false });
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -67,7 +83,14 @@ class AdminOrders extends Component {
   };
 
   handlePageChange = (page) => {
-    this.setState({ currentPage: page });
+    this.setState((prevState) => {
+      const nextPage = Math.min(Math.max(page, 1), prevState.totalPages);
+      if (nextPage === prevState.currentPage){
+        return null;
+      }
+      return { currentPage: nextPage };
+    });
+  
   };
 
   getStatusBadgeClass = (status) => {
@@ -81,7 +104,16 @@ class AdminOrders extends Component {
   };
 
   render() {
-    const { orders, loading, currentPage, totalPages, searchTerm, statusFilter } = this.state;
+    const {
+      orders,
+      loading,
+      currentPage,
+      totalPages,
+      searchTerm,
+      statusFilter,
+      hasNext,
+      hasPrev
+    } = this.state;
 
     if (loading) {
       return (
@@ -181,7 +213,7 @@ class AdminOrders extends Component {
             <div className="pagination-controls">
               <button
                 className="btn-pagination"
-                disabled={currentPage === 1}
+                disabled={!hasPrev}
                 onClick={() => this.handlePageChange(currentPage - 1)}
               >
                 Previous
@@ -199,7 +231,7 @@ class AdminOrders extends Component {
 
               <button
                 className="btn-pagination"
-                disabled={currentPage === totalPages}
+                disabled={!hasNext}
                 onClick={() => this.handlePageChange(currentPage + 1)}
               >
                 Next
