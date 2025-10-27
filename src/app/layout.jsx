@@ -1,9 +1,17 @@
 import React from 'react';
+import { Poppins } from 'next/font/google';
 import ConditionalLayout from '../components/ConditionalLayout';
 import ClientWrapper from '../components/ClientWrapper';
 import '../styles/globals.css';
 import '../components/Header/Header.css';
 import '../components/Footer/Footer.css';
+
+const poppins = Poppins({
+  weight: ['300', '400', '500', '600', '700', '800'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-poppins'
+});
 
 export const metadata = {
   title: "Cora'l - Premium Handbags & Fashion Accessories",
@@ -12,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className={poppins.variable}>
+      <body className={poppins.className}>
         <ClientWrapper>
           <ConditionalLayout>{children}</ConditionalLayout>
         </ClientWrapper>

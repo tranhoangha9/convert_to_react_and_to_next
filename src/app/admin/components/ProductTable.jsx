@@ -6,7 +6,13 @@ class ProductTable extends Component {
     const { products, loading, onEdit, onDelete, onActivate } = this.props;
 
     if (loading) {
-      return <div className="loading-message">Loading...</div>;
+      return (
+        <tr>
+          <td colSpan="7" className="loading-message">
+            Loading...
+          </td>
+        </tr>
+      );
     }
 
     if (products.length === 0) {
