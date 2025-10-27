@@ -31,6 +31,17 @@ export async function PUT(request, { params }) {
       }, { status: 403 })
     }
 
+    if (
+      existingUser.role === 'admin' &&
+      adminUser.role === 'admin' &&
+      parseInt(adminUser.id) !== parseInt(id)
+    ) {
+      return Response.json({
+        success: false,
+        error: 'Không thể chỉnh sửa tài khoản admin khác'
+      }, { status: 403 })
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(id) },
       data: {

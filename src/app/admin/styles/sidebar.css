@@ -6,6 +6,8 @@
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-sidebar h2 {
@@ -19,6 +21,7 @@
 .admin-nav {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
 }
 
 .admin-nav-item {

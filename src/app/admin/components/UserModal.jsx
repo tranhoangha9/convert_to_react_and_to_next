@@ -101,7 +101,12 @@ class UserModal extends Component {
         delete userData.password;
       }
 
-      const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+      let adminUser = {};
+      if (typeof window !== 'undefined') {
+        const sessionAdmin = sessionStorage.getItem('adminUser');
+        const localAdmin = localStorage.getItem('adminUser');
+        adminUser = JSON.parse(sessionAdmin || localAdmin || '{}');
+      }
       const response = await fetch(isEditing ? `/api/admin/users/${this.props.user.id}` : '/api/admin/users', {
         method: isEditing ? 'PUT' : 'POST',
         headers: { 
