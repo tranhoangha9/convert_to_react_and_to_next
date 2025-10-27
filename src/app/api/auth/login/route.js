@@ -2,7 +2,8 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, target } = await request.json();
+    const isAdminPortal = target === 'admin';
 
     if (!email || !password) {
       return Response.json({
@@ -39,7 +40,7 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
-    if (user.role === 'admin') {
+    if (user.role === 'admin' && !isAdminPortal) {
       return Response.json({
         success: false,
         error: 'Admin accounts cannot log in via the client portal'

@@ -42,7 +42,8 @@ class AdminLogin extends Component {
         },
         body: JSON.stringify({
           email: username,
-          password: password
+          password: password,
+          target: 'admin'
         })
       });
 
