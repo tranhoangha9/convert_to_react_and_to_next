@@ -345,6 +345,7 @@ class AdminUsers extends Component {
               user={editingUser}
               onClose={this.handleModalClose}
               onSuccess={this.handleModalSuccess}
+              isUserTab={activeTab === 'users'}
             />
           )}
         </div>

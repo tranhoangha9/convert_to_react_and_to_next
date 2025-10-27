@@ -204,9 +204,32 @@ class Account extends Component {
     }
   }
 
+  detectCountryCode = (phoneNumber) => {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+    
+    if (cleaned.startsWith('84')) return '+84';
+    if (cleaned.startsWith('0') && cleaned.length >= 10) return '+84';
+    if (cleaned.startsWith('1') && cleaned.length === 11) return '+1';
+    if (cleaned.startsWith('86') && cleaned.length >= 11) return '+86';
+    if (cleaned.startsWith('81') && cleaned.length >= 10) return '+81';
+    if (cleaned.startsWith('82') && cleaned.length >= 10) return '+82';
+    
+    return '+84';
+  }
+
   handleInputChange = (e) => {  
     const { name, value } = e.target;
-    this.setState({ [name]: value, error: '' });
+    
+    if (name === 'phone') {
+      const detectedCode = this.detectCountryCode(value);
+      this.setState({ 
+        phone: value, 
+        countryCode: detectedCode,
+        error: '' 
+      });
+    } else {
+      this.setState({ [name]: value, error: '' });
+    }
   }
 
   handleDeleteProfile = () => {

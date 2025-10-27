@@ -23,6 +23,7 @@
 
 .cart-breadcrumbs .breadcrumb-current{
     color: #626262;
+    padding: 0 10px;
 }
 
 .cart-header {

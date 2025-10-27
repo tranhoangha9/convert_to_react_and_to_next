@@ -80,6 +80,18 @@ export async function POST(request) {
       data: orderItemsData
     });
 
+    // Trừ stock của từng sản phẩm
+    for (const item of cartItems) {
+      await prisma.product.update({
+        where: { id: item.id },
+        data: {
+          stock: {
+            decrement: item.quantity
+          }
+        }
+      });
+    }
+
     return Response.json({
       success: true,
       orderId: order.id,

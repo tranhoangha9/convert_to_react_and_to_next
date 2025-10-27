@@ -1,5 +1,7 @@
 "use client";
 import React, { Component } from "react";
+import { getCurrentUser } from "@/lib/authService";
+import { getCart } from "@/lib/cartService";
 import "./CartModal.css";
 import Link from "next/link";
 
@@ -15,10 +17,17 @@ class CartModal extends Component {
   }
 
   componentDidMount() {
-    this.loadCartItems();
+    this.refreshCart();
+
     this.checkCartInterval = setInterval(() => {
-      this.loadCartItems();
-    }, 1000);
+      this.refreshCart(true);
+    }, 1500);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.isOpen && this.props.isOpen) {
+      this.refreshCart();
+    }
   }
 
   componentWillUnmount() {
@@ -27,13 +36,21 @@ class CartModal extends Component {
     }
   }
 
-  loadCartItems = () => {
+  refreshCart = async (isPolling = false) => {
+    const user = getCurrentUser();
+    if (user && user.id) {
+      const items = await getCart();
+      this.setState({ items });
+      return;
+    }
+
+    if (!isPolling && !this.props.isOpen) return;
+
     const savedCart = localStorage.getItem("cartItems");
-    if (savedCart) {
-      const newItems = JSON.parse(savedCart);
-      if (JSON.stringify(this.state.items) !== JSON.stringify(newItems)) {
-        this.setState({ items: newItems });
-      }
+    const newItems = savedCart ? JSON.parse(savedCart) : [];
+
+    if (JSON.stringify(this.state.items) !== JSON.stringify(newItems)) {
+      this.setState({ items: newItems });
     }
   };
 

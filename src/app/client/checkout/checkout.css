@@ -23,6 +23,7 @@
 
 .checkout-breadcrumbs .breadcrumb-current {
     color: #626262;
+    padding: 0 10px;
 }
 
 .checkout-header {
@@ -399,6 +400,7 @@ max-width: 35%;
   display: flex;
   justify-content: space-between;
   margin-top: 16px;
+  margin-bottom: 32px;
   padding-top: 16px;
   border-top: 1px solid #e1e5e9;
   font-size: 18px;

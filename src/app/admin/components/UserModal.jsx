@@ -25,7 +25,9 @@ class UserModal extends Component {
 
     this.state = {
       ...defaultState,
-      ...userData
+      ...userData,
+      adminPassword: '',
+      originalRole: props.user?.role || 'user'
     };
   }
 
@@ -39,7 +41,7 @@ class UserModal extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { name, email, password, phone } = this.state;
+    const { name, email, password, phone, role, originalRole, adminPassword } = this.state;
     const isEditing = this.props.user && this.props.user.id;
 
     if (!name.trim()) {
@@ -70,6 +72,18 @@ class UserModal extends Component {
 
     if (phone && phone.trim() && !/^[0-9+\-\s()]+$/.test(phone.trim())) {
       alert('Số điện thoại không hợp lệ');
+      return;
+    }
+
+    if (isEditing && ((originalRole === 'staff' && role === 'admin') || (originalRole === 'admin' && role === 'staff'))) {
+      if (adminPassword !== 'okadmindeptrai') {
+        alert('Mật khẩu cấp 2 không đúng!');
+        return;
+      }
+    }
+
+    if (isEditing && (originalRole === 'admin' || originalRole === 'staff') && role === 'user') {
+      alert('Không thể chuyển Admin/Staff thành User!');
       return;
     }
 
@@ -112,16 +126,19 @@ class UserModal extends Component {
   }
 
   render() {
-    const { onClose, user, isEditable = true } = this.props;
+    const { onClose, user, isEditable = true, isUserTab = false } = this.props;
     const isViewOnly = user && user.id && user.role !== 'admin' && user.role !== 'staff';
     const isStaffModal = user && (user.role === 'staff' || user.role === 'admin');
+    const isEditingRoleChange = user && user.id && 
+      ((this.state.originalRole === 'staff' && this.state.role === 'admin') || 
+       (this.state.originalRole === 'admin' && this.state.role === 'staff'));
 
     return (
       <div className="modal-overlay">
         <div className="modal-content">
           <div className="modal-header">
             <h3>
-              {user && user.id ? (user.role === 'staff' ? 'Edit Staff' : 'Edit User') : (user && user.role === 'staff' ? 'Add Staff' : 'Add New User')}
+              {user && user.id ? (isUserTab ? 'User Information' : (user.role === 'staff' || user.role === 'admin' ? 'Edit Staff/Admin' : 'Edit User')) : (user && user.role === 'staff' ? 'Add Staff' : 'Add New User')}
             </h3>
             <button className="modal-close" onClick={onClose}>×</button>
           </div>
@@ -170,10 +187,20 @@ class UserModal extends Component {
                   name="role"
                   value={this.state.role}
                   onChange={this.handleInputChange}
+                  disabled={isUserTab || isViewOnly}
                 >
-                  <option value="user">User</option>
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                  {(this.state.originalRole === 'admin' || this.state.originalRole === 'staff') ? (
+                    <>
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="user">User</option>
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
@@ -200,6 +227,20 @@ class UserModal extends Component {
                 onChange={this.handleInputChange}
               />
             </div>
+
+            {isEditingRoleChange && (
+              <div className="form-group">
+                <label style={{color: '#dc2626', fontWeight: 'bold'}}>Mật khẩu cấp 2 (bắt buộc khi thay đổi Admin ↔ Staff)</label>
+                <input
+                  type="password"
+                  name="adminPassword"
+                  value={this.state.adminPassword}
+                  onChange={this.handleInputChange}
+                  placeholder="Nhập mật khẩu cấp 2"
+                  required
+                />
+              </div>
+            )}
 
             <div className="modal-actions">
               {!isViewOnly && (

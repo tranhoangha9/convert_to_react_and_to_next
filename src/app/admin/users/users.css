@@ -159,9 +159,12 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
+  display: inline-block;
+  transition: all 0.2s ease;
 }
 
 .role-admin { background: #fee2e2; color: #991b1b; }
+.role-staff { background: #dbeafe; color: #1e40af; }
 .role-manager { background: #dbeafe; color: #1e40af; }
 .role-customer { background: #dcfce7; color: #166534; }
 
@@ -456,7 +459,7 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+
 }
 
 .user-form .form-row {
