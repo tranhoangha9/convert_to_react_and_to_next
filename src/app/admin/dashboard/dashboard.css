@@ -108,6 +108,51 @@
 }
 
 /* ===== TABLES ===== */
+
+
+.dashboard-page .admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.dashboard-page .admin-table img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.dashboard-page .admin-table thead {
+  background: #f8fafc;
+}
+
+.dashboard-page .admin-table th {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.dashboard-page .admin-table th.text-left {
+  text-align: left;
+}
+
+.dashboard-page .admin-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+  color: #334155;
+}
+
+.dashboard-page .admin-table tbody tr:hover {
+  background: #f8fafc;
+}
+
 .orders-table {
   width: 100%;
   border-collapse: collapse;

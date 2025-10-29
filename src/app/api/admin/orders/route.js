@@ -8,6 +8,8 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get('limit')) || 10;
     const status = searchParams.get('status') || 'all';
     const search = searchParams.get('search') || '';
+    const sortParam = searchParams.get('sort');
+    const sortOrder = sortParam === 'asc' ? 'asc' : 'desc';
 
     const skip = (page - 1) * limit;
 
@@ -34,7 +36,7 @@ export async function GET(request) {
           select: { quantity: true }
         }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { id: sortOrder },
       skip,
       take: limit
     });

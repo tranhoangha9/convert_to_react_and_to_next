@@ -1,10 +1,16 @@
 import prisma from '@/lib/prisma'
+import { requireAuth } from '@/lib/authMiddleware'
+
+const SECOND_LEVEL_PASSWORD = process.env.ADMIN_SECOND_PASSWORD || 'okadmindeptrai';
 
 export async function PUT(request, { params }) {
   try {
-    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
+    const authResult = requireAuth(request, ['admin', 'staff']);
+    if (authResult.error) return authResult.error;
+    const adminUser = authResult.user;
+
     const { id } = params
-    const { name, email, role, isActive, phone, address } = await request.json()
+    const { name, email, role, isActive, phone, address, adminPassword } = await request.json()
 
     const existingUser = await prisma.user.findUnique({
       where: { id: parseInt(id) }
@@ -31,15 +37,25 @@ export async function PUT(request, { params }) {
       }, { status: 403 })
     }
 
-    if (
-      existingUser.role === 'admin' &&
-      adminUser.role === 'admin' &&
-      parseInt(adminUser.id) !== parseInt(id)
-    ) {
-      return Response.json({
-        success: false,
-        error: 'Không thể chỉnh sửa tài khoản admin khác'
-      }, { status: 403 })
+    const isEditingOtherAdmin = existingUser.role === 'admin' && adminUser.role === 'admin' && parseInt(adminUser.id) !== parseInt(id)
+    const isPromotingToAdmin = existingUser.role === 'staff' && role === 'admin'
+    const isDemotingToStaff = existingUser.role === 'admin' && role === 'staff'
+    const requiresSecondPassword = isEditingOtherAdmin || isPromotingToAdmin || isDemotingToStaff
+
+    if (requiresSecondPassword) {
+      if (!adminPassword) {
+        return Response.json({
+          success: false,
+          error: 'Vui lòng nhập mật khẩu cấp 2'
+        }, { status: 403 })
+      }
+
+      if (adminPassword !== SECOND_LEVEL_PASSWORD) {
+        return Response.json({
+          success: false,
+          error: 'Mật khẩu cấp 2 không đúng'
+        }, { status: 403 })
+      }
     }
 
     const updatedUser = await prisma.user.update({
@@ -81,7 +97,10 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
+    const authResult = requireAuth(request, ['admin']);
+    if (authResult.error) return authResult.error;
+    const adminUser = authResult.user;
+
     const { id } = params
 
     const existingUser = await prisma.user.findUnique({
@@ -101,10 +120,10 @@ export async function DELETE(request, { params }) {
         error: 'Bạn không có quyền xóa người dùng'
       }, { status: 403 })
     }
-    if (existingUser.role === 'admin' || existingUser.role === 'staff') {
+    if (existingUser.role === 'admin') {
       return Response.json({
         success: false,
-        error: 'Không thể xóa admin hoặc staff'
+        error: 'Không thể xóa admin'
       }, { status: 403 })
     }
 

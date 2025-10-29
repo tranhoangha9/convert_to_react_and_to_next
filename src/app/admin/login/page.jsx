@@ -59,6 +59,7 @@ class AdminLogin extends Component {
         }
 
         sessionStorage.setItem('adminUser', JSON.stringify(data.user));
+        sessionStorage.setItem('adminToken', data.token);
 
         window.location.href = '/admin/dashboard';
       } else {

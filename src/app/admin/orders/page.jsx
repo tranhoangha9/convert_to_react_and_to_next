@@ -16,7 +16,8 @@ class AdminOrders extends Component {
       hasNext: false,
       hasPrev: false,
       searchTerm: '',
-      statusFilter: 'all'
+      statusFilter: 'all',
+      sortOrder: 'desc'
     };
   }
 
@@ -28,7 +29,8 @@ class AdminOrders extends Component {
     if (
       prevState.currentPage !== this.state.currentPage ||
       prevState.searchTerm !== this.state.searchTerm ||
-      prevState.statusFilter !== this.state.statusFilter
+      prevState.statusFilter !== this.state.statusFilter ||
+      prevState.sortOrder !== this.state.sortOrder
     ) {
       this.fetchOrders();
     }
@@ -39,9 +41,10 @@ class AdminOrders extends Component {
       this.setState({ loading: true });
       const params = new URLSearchParams({
         page: this.state.currentPage.toString(),
-        limit: '10',
+        limit: '8',
         search: this.state.searchTerm,
-        status: this.state.statusFilter
+        status: this.state.statusFilter,
+        sort: this.state.sortOrder
       });
       const response = await fetch(`/api/admin/orders?${params.toString()}`);
       const data = await response.json();
@@ -68,18 +71,18 @@ class AdminOrders extends Component {
     }
   };
 
-  handleSearchChange = (e) => {
-    this.setState({
-      searchTerm: e.target.value,
-      currentPage: 1
-    });
-  };
-
   handleStatusFilterChange = (e) => {
     this.setState({
       statusFilter: e.target.value,
       currentPage: 1
     });
+  };
+
+  toggleSortOrder = () => {
+    this.setState(prevState => ({
+      sortOrder: prevState.sortOrder === 'desc' ? 'asc' : 'desc',
+      currentPage: 1
+    }));
   };
 
   handlePageChange = (page) => {
@@ -112,7 +115,8 @@ class AdminOrders extends Component {
       searchTerm,
       statusFilter,
       hasNext,
-      hasPrev
+      hasPrev,
+      sortOrder
     } = this.state;
 
     if (loading) {
@@ -132,14 +136,14 @@ class AdminOrders extends Component {
       <AuthGuard>
         <div className="admin-container">
           <AdminSidebar currentPath="/admin/orders" />
-        <div className="admin-content">
+        <div className="admin-content orders-page">
           <div className="orders-controls">
             <div className="orders-search-box">
               <input
                 type="text"
-                placeholder="Search by order ID, customer name or email..."
+                placeholder="Search by order ID, customer name or email... (coming soon)"
                 value={searchTerm}
-                onChange={this.handleSearchChange}
+                readOnly
               />
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
@@ -163,7 +167,14 @@ class AdminOrders extends Component {
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Order ID</th>
+                  <th
+                    className="sortable-header"
+                    onClick={this.toggleSortOrder}
+                    role="button"
+                    aria-label={`Sort by Order ID ${sortOrder === 'desc' ? 'ascending' : 'descending'}`}
+                  >
+                    Order ID
+                  </th>
                   <th className="text-left">Customer</th>
                   <th>Phone</th>
                   <th>Amount</th>

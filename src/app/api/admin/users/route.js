@@ -1,16 +1,14 @@
 import prisma from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
+import { requireAuth } from '@/lib/authMiddleware'
 
 export async function POST(request) {
   try {
-    const adminUser = JSON.parse(request.headers.get('x-admin-user') || '{}');
-    const { name, email, password, role, isActive, phone, address } = await request.json()
+    const authResult = requireAuth(request, ['admin']);
+    if (authResult.error) return authResult.error;
+    const adminUser = authResult.user;
 
-    if (adminUser.role === 'staff' && (role === 'admin' || role === 'staff')) {
-      return Response.json({
-        success: false,
-        error: 'Bạn không có quyền tạo tài khoản với role này'
-      }, { status: 403 })
-    }
+    const { name, email, password, role, isActive, phone, address } = await request.json()
 
     const existingUser = await prisma.user.findUnique({
       where: { email }
@@ -23,13 +21,13 @@ export async function POST(request) {
       }, { status: 400 })
     }
 
-    const userPassword = password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
-        password: userPassword,
+        password: hashedPassword,
         role,
         isActive,
         phone,
@@ -64,18 +62,25 @@ export async function POST(request) {
 
 export async function GET(request) {
     try {
+        const authResult = requireAuth(request, ['admin']);
+        if (authResult.error) return authResult.error;
 
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get('page')) || 1;
         const limit = parseInt(searchParams.get('limit')) || 10;
-        const role = searchParams.get('role') || 'all';
+        const roleGroup = searchParams.get('roleGroup') || 'all';
+        const roleParam = searchParams.get('role') || 'all';
         const status = searchParams.get('status') || 'all';
         const search = searchParams.get('search') || '';
 
         const skip = (page - 1) * limit;
 
         let where = {};
-        if (role !== 'all') where.role = role;
+        if (roleParam !== 'all') where.role = roleParam;
+        if (roleGroup === 'admins') {
+          where.role = { in: ['admin', 'staff'] };
+          where.isActive = true;
+        }
         if (status !== 'all') where.isActive = status === 'active';
 
         if (search) {

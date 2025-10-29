@@ -10,7 +10,9 @@ class Checkout extends Component {
       cartItems: [],
       showInformation: false,
       showPayment: false,
-      discount: 0, 
+      discount: 0,
+      discountCode: null,
+      discountId: null,
 
       information: {
         fullName: '',
@@ -40,9 +42,13 @@ class Checkout extends Component {
 
     if (typeof window !== 'undefined') {
       const savedDiscount = sessionStorage.getItem('cartDiscount');
-      if (savedDiscount) {
-        this.setState({ discount: parseFloat(savedDiscount) });
-      }
+      const savedDiscountCode = sessionStorage.getItem('cartDiscountCode');
+      const savedDiscountId = sessionStorage.getItem('cartDiscountId');
+      this.setState({
+        discount: savedDiscount ? parseFloat(savedDiscount) : 0,
+        discountCode: savedDiscountCode || null,
+        discountId: savedDiscountId ? parseInt(savedDiscountId, 10) : null
+      });
     }
   }
 
@@ -117,7 +123,7 @@ class Checkout extends Component {
   }
 
   handlePlaceOrder = async () => {
-    const { information, payment, cartItems, discount } = this.state;
+    const { information, payment, cartItems, discount, discountCode, discountId } = this.state;
 
     if (cartItems.length === 0) {
       alert('Giỏ hàng trống!');
@@ -144,6 +150,11 @@ class Checkout extends Component {
       const { getCurrentUser } = await import('@/lib/authService');
       const user = getCurrentUser();
 
+      if (discount > 0 && (!discountCode || !discountId)) {
+        alert('Không tìm thấy mã giảm giá đã áp dụng. Vui lòng thử áp lại.');
+        return;
+      }
+
       const orderData = {
         userId: user.id,
         customerInfo: information,
@@ -151,7 +162,8 @@ class Checkout extends Component {
         cartItems: cartItems,
         total: this.calculateTotal(),
         discount: discount || 0,
-        discountCode: discount && discount > 0 ? 'giamgia' : null
+        discountCode: discount > 0 ? discountCode : null,
+        discountId: discount > 0 ? discountId : null
       };
 
       const response = await fetch('/api/client/orders', {
@@ -170,6 +182,8 @@ class Checkout extends Component {
 
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('cartDiscount');
+          sessionStorage.removeItem('cartDiscountCode');
+          sessionStorage.removeItem('cartDiscountId');
         }
 
         alert('Đặt hàng thành công!');

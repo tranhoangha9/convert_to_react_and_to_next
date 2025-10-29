@@ -1,5 +1,6 @@
 'use client';
 import React, { Component } from 'react';
+import '../products/product.css';
 
 class ProductForm extends Component {
   constructor(props) {

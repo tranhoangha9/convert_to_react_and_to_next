@@ -80,7 +80,7 @@ class AdminDashboard extends Component {
       <AuthGuard>
         <div className="admin-container">
           <AdminSidebar currentPath="/admin/dashboard" />
-        <div className="admin-content">
+        <div className="admin-content dashboard-page">
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-icon">

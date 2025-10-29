@@ -62,6 +62,10 @@ class Login extends Component {
         const { loginUser } = await import('@/lib/authService');
         loginUser(data.user);
 
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userToken', data.token);
+        }
+
         try {
           const { mergeLocalCartToDb } = await import('@/lib/cartService');
           await mergeLocalCartToDb(data.user.id);

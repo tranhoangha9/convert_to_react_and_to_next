@@ -15,7 +15,7 @@ const poppins = Poppins({
 
 export const metadata = {
   title: "Cora'l - Premium Handbags & Fashion Accessories",
-  description: "Discover premium handbags and accessories at Cora'l. Shop the latest collection of stylish bags, purses, and fashion accessories with fast shipping and secure checkout.",
+  description: "Discover premium handbags and accessories at Cora'l. HoangHa's shop the latest collection of stylish bags, purses, and fashion accessories with fast shipping and secure checkout.",
 };
 
 export default function RootLayout({ children }) {

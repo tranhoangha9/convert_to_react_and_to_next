@@ -1,4 +1,6 @@
 import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { signToken } from '@/lib/jwt';
 
 export async function POST(request) {
   try {
@@ -47,7 +49,23 @@ export async function POST(request) {
       }, { status: 403 });
     }
 
-    if (user.password !== password) {
+    let passwordValid = false;
+    const isBcryptHash = user.password.startsWith('$2a$') || user.password.startsWith('$2b$');
+
+    if (isBcryptHash) {
+      passwordValid = await bcrypt.compare(password, user.password);
+    } else {
+      passwordValid = user.password === password;
+      if (passwordValid) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { password: hashedPassword }
+        });
+      }
+    }
+
+    if (!passwordValid) {
       return Response.json({
         success: false,
         error: 'Invalid email or password'
@@ -56,8 +74,15 @@ export async function POST(request) {
 
     const { password: _, ...userWithoutPassword } = user;
 
+    const token = signToken({
+      id: user.id,
+      email: user.email,
+      role: user.role
+    });
+
     return Response.json({
       success: true,
+      token,
       user: {
         ...userWithoutPassword,
         loginTime: new Date().toISOString()

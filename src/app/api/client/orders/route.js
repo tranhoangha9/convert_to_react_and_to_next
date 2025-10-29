@@ -42,55 +42,79 @@ export async function POST(request) {
     const shippingAddress = `${customerInfo.fullName}, ${customerInfo.mobileNumber}, ${customerInfo.state}, ${customerInfo.city}${customerInfo.pinCode ? ', ' + customerInfo.pinCode : ''}`;
 
     let discountId = null;
-    if (discount && discount > 0) {
+    if (discount && discount > 0 && discountCode) {
       const discountRecord = await prisma.discount.findFirst({
         where: {
-          code: discountCode || 'giamgia', 
+          code: discountCode,
           isActive: true
         }
       });
 
-      if (discountRecord) {
-        discountId = discountRecord.id;
+      if (!discountRecord) {
+        return Response.json({
+          success: false,
+          error: 'Mã giảm giá không hợp lệ'
+        }, { status: 400 });
+      }
+
+      discountId = discountRecord.id;
+    }
+
+    for (const item of cartItems) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.id },
+        select: { stock: true, name: true }
+      });
+
+      if (!product || product.stock < item.quantity) {
+        const productName = product?.name || `Sản phẩm #${item.id}`;
+        const remaining = product?.stock ?? 0;
+        return Response.json({
+          success: false,
+          error: `Sản phẩm "${productName}" chỉ còn lại ${remaining} sản phẩm`
+        }, { status: 400 });
       }
     }
 
-    const order = await prisma.order.create({
-      data: {
-        userId: user.id,
-        totalAmount: total,
-        discountId: discountId,
-        paymentMethod: paymentInfo.method,
-        status: 'pending',
-        customerInfo: JSON.stringify(customerInfo),
-        paymentInfo: JSON.stringify(paymentInfo),
-        shippingAddress: shippingAddress,
-        notes: null
-      }
-    });
-
-    const orderItemsData = cartItems.map(item => ({
-      orderId: order.id,
-      productId: item.id,
-      quantity: item.quantity,
-      price: item.price
-    }));
-
-    await prisma.orderItem.createMany({
-      data: orderItemsData
-    });
-
-    // Trừ stock của từng sản phẩm
-    for (const item of cartItems) {
-      await prisma.product.update({
-        where: { id: item.id },
+    const order = await prisma.$transaction(async (tx) => {
+      const newOrder = await tx.order.create({
         data: {
-          stock: {
-            decrement: item.quantity
-          }
+          userId: user.id,
+          totalAmount: total,
+          discountId: discountId,
+          paymentMethod: paymentInfo.method,
+          status: 'pending',
+          customerInfo: JSON.stringify(customerInfo),
+          paymentInfo: JSON.stringify(paymentInfo),
+          shippingAddress: shippingAddress,
+          notes: null
         }
       });
-    }
+
+      const orderItemsData = cartItems.map(item => ({
+        orderId: newOrder.id,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      await tx.orderItem.createMany({
+        data: orderItemsData
+      });
+
+      for (const item of cartItems) {
+        await tx.product.update({
+          where: { id: item.id },
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          }
+        });
+      }
+
+      return newOrder;
+    });
 
     return Response.json({
       success: true,

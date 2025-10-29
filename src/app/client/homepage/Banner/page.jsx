@@ -141,7 +141,7 @@ class Banner extends Component {
           <button 
             className={`dot ${currentSlide === 2 ? 'active' : ''}`}
             onClick={() => this.goTo(2)}
-          ></button>
+          ></button>  
         </div>
       </div>
     </section>

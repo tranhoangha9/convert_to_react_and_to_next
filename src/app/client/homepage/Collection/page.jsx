@@ -7,10 +7,10 @@ class Collection extends Component {
     super(props);
     this.state = {
       collections: [
-        { id: 1, name: "Handbags", image: "/assets/images/collection1.png" },
-        { id: 2, name: "Watches", image: "/assets/images/collection2.png" },
-        { id: 3, name: "Skincare", image: "/assets/images/collection3.png" },
-        { id: 4, name: "Jewellery", image: "/assets/images/collection4.png" }
+        { id: 1, name: "Personal Care", image: "/assets/images/collection1.png" },
+        { id: 2, name: "Handbags", image: "/assets/images/collection2.png" },
+        { id: 3, name: "Wrist Watches", image: "/assets/images/collection3.png" },
+        { id: 4, name: "Sun Glasses", image: "/assets/images/collection4.png" }
       ]
     };
   }

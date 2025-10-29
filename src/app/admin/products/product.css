@@ -1,3 +1,9 @@
+/* Product page specific styles */
+
+.product-form-card {
+  margin-bottom: 30px;
+}
+
 .admin-container {
   display: flex;
   min-height: 100vh;
@@ -84,7 +90,7 @@
 .admin-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+
 }
 
 .form-row {
@@ -97,13 +103,13 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .form-group label {
   font-size: 14px;
   font-weight: 600;
   color: #334155;
+  margin-top: 8px;
 }
 
 .form-group input,
@@ -176,26 +182,27 @@
   background: #f8fafc;
 }
 
-.admin-table {
+/* Product table styles */
+.product-page .admin-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-.admin-table img {
+.product-page .admin-table img {
   width: 50px;
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.admin-table thead {
+.product-page .admin-table thead {
   background: #f8fafc;
 }
 
-.admin-table th {
+.product-page .admin-table th {
   padding: 14px 16px;
-  text-align: left;
+  text-align: center;
   font-size: 13px;
   font-weight: 600;
   color: #64748b;
@@ -204,19 +211,20 @@
   border-bottom: 2px solid #e2e8f0;
 }
 
-.admin-table td {
+.product-page .admin-table td {
   padding: 16px;
   border-bottom: 1px solid #e2e8f0;
   font-size: 14px;
   color: #334155;
 }
 
-.admin-table tbody tr:hover {
+.product-page .admin-table tbody tr:hover {
   background: #f8fafc;
 }
 
 .image-preview img {
-  width: 200px;
+  margin-top: 10px;
+  width: 300px;
   height: auto;
   object-fit: contain;
   border-radius: 4px;
@@ -263,14 +271,9 @@
   color: #721c24;
 }
 
-
-.admin-card-with-margin {
-  margin-top: 30px;
-}
-
 .admin-card-header {
   display: flex;
-  justify-content: flex-end;
+
   align-items: center;
   margin-bottom: 20px;
 }

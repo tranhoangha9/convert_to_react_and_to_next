@@ -34,30 +34,55 @@ class Cart extends Component {
     }
   }
 
-  applyCoupon = () => {
+  applyCoupon = async () => {
     const couponInput = document.getElementById('coupon-input');
-    if (couponInput && couponInput.value === 'giamgia') {
-      const { cartItems } = this.state;
-      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const discount = subtotal * 0.5;
+    const code = couponInput?.value?.trim();
 
-      this.setState({
-        discount: discount,
-        isCouponApplied: true
+    if (!code) {
+      alert('Vui lòng nhập mã giảm giá');
+      return;
+    }
+
+    const { cartItems } = this.state;
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    try {
+      const response = await fetch('/api/client/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal })
       });
 
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('cartDiscount', discount.toString());
-      }
+      const data = await response.json();
 
-      const removeBtn = document.querySelector('.coupon-remove-btn');
-      if (removeBtn) {
-        removeBtn.style.display = 'inline-block';
-      }
+      if (data.success) {
+        const discountAmount = Number(data.discount?.amount ?? 0);
 
-      alert('Áp dụng coupon thành công! Giảm 50%');
-    } else {
-      alert('Mã coupon không đúng!');
+        this.setState({
+          discount: discountAmount,
+          isCouponApplied: true
+        });
+
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('cartDiscount', discountAmount.toString());
+          sessionStorage.setItem('cartDiscountCode', code);
+          if (data.discount?.id) {
+            sessionStorage.setItem('cartDiscountId', data.discount.id.toString());
+          }
+        }
+
+        const removeBtn = document.querySelector('.coupon-remove-btn');
+        if (removeBtn) {
+          removeBtn.style.display = 'inline-block';
+        }
+
+        alert(`Áp dụng mã giảm giá thành công! Giảm ${data.discount.percentage}%`);
+      } else {
+        alert(data.error || 'Mã giảm giá không hợp lệ');
+      }
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      alert('Có lỗi xảy ra khi áp dụng mã giảm giá');
     }
   }
 
@@ -69,6 +94,8 @@ class Cart extends Component {
 
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('cartDiscount');
+      sessionStorage.removeItem('cartDiscountCode');
+      sessionStorage.removeItem('cartDiscountId');
     }
 
     const removeBtn = document.querySelector('.coupon-remove-btn');
@@ -89,6 +116,27 @@ class Cart extends Component {
       await this.loadCartFromService();
     } catch (error) {
       console.error('Error removing item:', error);
+    }
+  }
+
+  handleQuantityChange = async (id, delta) => {
+    const targetItem = this.state.cartItems.find(item => item.id === id);
+    if (!targetItem) return;
+
+    const newQuantity = Math.max(1, targetItem.quantity + delta);
+
+    this.setState(prevState => ({
+      cartItems: prevState.cartItems.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    }));
+
+    try {
+      const { updateCartItemQuantity } = await import('@/lib/cartService');
+      await updateCartItemQuantity(id, newQuantity);
+      await this.loadCartFromService();
+    } catch (error) {
+      console.error('Error updating quantity:', error);
     }
   }
 
@@ -149,7 +197,27 @@ class Cart extends Component {
                       <div className="product-details">
                         <h4 className="cart-brand">{item.name}</h4>
                         <p className="cart-product-name">{item.description || 'Product Description'}</p>
-                        <p className="cart-qty-text">Qty: {item.quantity}</p>
+                        <div className="cart-qty-info">
+                          <p className="cart-qty-text">Qty: {item.quantity}</p>
+                          <div className="cart-qty-action-group">
+                            <button
+                              type="button"
+                              className="cart-qty-action-btn"
+                              onClick={() => this.handleQuantityChange(item.id, -1)}
+                              aria-label={`Decrease quantity of ${item.name}`}
+                            >
+                              -
+                            </button>
+                            <button
+                              type="button"
+                              className="cart-qty-action-btn"
+                              onClick={() => this.handleQuantityChange(item.id, 1)}
+                              aria-label={`Increase quantity of ${item.name}`}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="cart-item-price">${item.price.toFixed(2)}</div>

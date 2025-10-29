@@ -146,59 +146,8 @@
   text-align: center !important;
 }
 
-.product-form-card {
-  margin-bottom: 30px;
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.admin-table img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.admin-table thead {
-  background: #f8fafc;
-}
-
-.admin-table th {
-  padding: 14px 16px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.admin-table th.text-left {
-  text-align: left;
-}
-
-.admin-table td {
-  padding: 16px;
-  border-bottom: 1px solid #e2e8f0;
-  font-size: 14px;
-  color: #334155;
-}
-
-.admin-table tbody tr:hover {
-  background: #f8fafc;
-}
-
-.image-preview img {
-  width: 200px;
-  height: auto;
-  object-fit: contain;
-  border-radius: 4px;
-  display: block;
+.text-left {
+  text-align: left !important;
 }
 
 .modal-overlay {
@@ -288,12 +237,6 @@
   flex-direction: column;
 }
 
-.form-group label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #475569;
-  margin-bottom: 8px;
-}
 
 .form-group input,
 .form-group select,

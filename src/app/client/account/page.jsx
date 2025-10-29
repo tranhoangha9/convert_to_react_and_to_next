@@ -15,7 +15,6 @@ class Account extends Component {
       lastName: '',
       email: '',
       phone: '',
-      dateOfBirth: '',
       countryCode: '',
       address: '',
       newPassword: '',
@@ -35,7 +34,6 @@ class Account extends Component {
         phone: savedProfile.phone || '',
         address: savedProfile.address || '',
         countryCode: detectedCode,
-        dateOfBirth: savedProfile.dateOfBirth || '',
         profileImageUrl: savedProfile.profileImageUrl || null
       });
     }
@@ -393,7 +391,7 @@ class Account extends Component {
               <div className="form-group">
                 <label>Date of birth</label>
                 <div className="date-input">
-                  <input type="date" value={this.state.dateOfBirth} name="dateOfBirth" disabled />
+                  <input type="date" name="dateOfBirth" disabled />
                 </div>
               </div>
             </div>

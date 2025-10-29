@@ -57,11 +57,31 @@ class AdminUsers extends Component {
         roleParam = 'all';
       }
 
+      const params = new URLSearchParams({
+        page: this.state.currentPage.toString(),
+        search: this.state.searchTerm,
+        role: roleParam
+      });
+
+      if (this.state.activeTab === 'admins') {
+        params.append('roleGroup', 'admins');
+      }
+
+      let token = '';
+      if (typeof window !== 'undefined') {
+        token = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || '';
+      }
+
       const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
-      const response = await fetch(`/api/admin/users?page=${this.state.currentPage}&search=${this.state.searchTerm}&role=${roleParam}`, {
-        headers: {
-          'x-admin-user': JSON.stringify(adminUser)
-        }
+      const headers = {
+        'x-admin-user': JSON.stringify(adminUser)
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/admin/users?${params.toString()}`, {
+        headers
       });
       const data = await response.json();
 
@@ -69,8 +89,6 @@ class AdminUsers extends Component {
         let filteredUsers = data.users;
         if (this.state.activeTab === 'users') {
           filteredUsers = data.users.filter(user => user.role !== 'admin' && user.role !== 'staff');
-        } else if (this.state.activeTab === 'admins') {
-          filteredUsers = data.users.filter(user => user.role === 'admin' || user.role === 'staff');
         }
 
         this.setState({
@@ -139,11 +157,15 @@ class AdminUsers extends Component {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+      let token = '';
+      if (typeof window !== 'undefined') {
+        token = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || '';
+      }
+
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'x-admin-user': JSON.stringify(adminUser)
+          'Authorization': token ? `Bearer ${token}` : ''
         }
       });
 
@@ -209,7 +231,7 @@ class AdminUsers extends Component {
       <AuthGuard>
         <div className="admin-container">
           <AdminSidebar currentPath="/admin/users" />
-          <div className="admin-content">
+          <div className="admin-content users-page">
           <div className="admin-users">
             <div className="users-tabs">
               <button

@@ -27,8 +27,28 @@ class UserModal extends Component {
       ...defaultState,
       ...userData,
       adminPassword: '',
-      originalRole: props.user?.role || 'user'
+      originalRole: props.user?.role || 'user',
+      currentAdminId: null
     };
+  }
+
+  componentDidMount() {
+    if (typeof window !== 'undefined') {
+      let adminId = null;
+      try {
+        const storedAdmin = sessionStorage.getItem('adminUser') || localStorage.getItem('adminUser');
+        if (storedAdmin) {
+          const parsed = JSON.parse(storedAdmin);
+          if (parsed && parsed.id) {
+            adminId = parsed.id;
+          }
+        }
+      } catch (error) {
+        console.error('Error reading admin user from storage:', error);
+      }
+
+      this.setState({ currentAdminId: adminId });
+    }
   }
 
   handleInputChange = (e) => {
@@ -41,8 +61,9 @@ class UserModal extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { name, email, password, phone, role, originalRole, adminPassword } = this.state;
+    const { name, email, password, phone, role, originalRole, adminPassword, currentAdminId } = this.state;
     const isEditing = this.props.user && this.props.user.id;
+    const editingUserId = this.props.user?.id;
 
     if (!name.trim()) {
       alert('Vui lòng nhập tên');
@@ -75,9 +96,13 @@ class UserModal extends Component {
       return;
     }
 
-    if (isEditing && ((originalRole === 'staff' && role === 'admin') || (originalRole === 'admin' && role === 'staff'))) {
-      if (adminPassword !== 'okadmindeptrai') {
-        alert('Mật khẩu cấp 2 không đúng!');
+    const isEditingOtherAdmin = isEditing && originalRole === 'admin' && (currentAdminId === null || String(currentAdminId) !== String(editingUserId));
+    const isRoleChangingBetweenStaffAdmin = isEditing && ((originalRole === 'staff' && role === 'admin') || (originalRole === 'admin' && role === 'staff'));
+    const requiresSecondPassword = isEditingOtherAdmin || isRoleChangingBetweenStaffAdmin;
+
+    if (requiresSecondPassword) {
+      if (!adminPassword.trim()) {
+        alert('Vui lòng nhập mật khẩu cấp 2');
         return;
       }
     }
@@ -99,19 +124,21 @@ class UserModal extends Component {
 
       if (isEditing) {
         delete userData.password;
+        if (requiresSecondPassword) {
+          userData.adminPassword = adminPassword.trim();
+        }
       }
 
-      let adminUser = {};
+      let token = '';
       if (typeof window !== 'undefined') {
-        const sessionAdmin = sessionStorage.getItem('adminUser');
-        const localAdmin = localStorage.getItem('adminUser');
-        adminUser = JSON.parse(sessionAdmin || localAdmin || '{}');
+        token = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || '';
       }
+
       const response = await fetch(isEditing ? `/api/admin/users/${this.props.user.id}` : '/api/admin/users', {
         method: isEditing ? 'PUT' : 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'x-admin-user': JSON.stringify(adminUser)
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(userData)
       });
@@ -133,10 +160,11 @@ class UserModal extends Component {
   render() {
     const { onClose, user, isEditable = true, isUserTab = false } = this.props;
     const isViewOnly = user && user.id && user.role !== 'admin' && user.role !== 'staff';
-    const isStaffModal = user && (user.role === 'staff' || user.role === 'admin');
+    const isEditingOtherAdmin = user && user.id && this.state.originalRole === 'admin' && (this.state.currentAdminId === null || String(this.state.currentAdminId) !== String(user.id));
     const isEditingRoleChange = user && user.id && 
       ((this.state.originalRole === 'staff' && this.state.role === 'admin') || 
        (this.state.originalRole === 'admin' && this.state.role === 'staff'));
+    const shouldShowSecondPasswordInput = isEditingOtherAdmin || isEditingRoleChange;
 
     return (
       <div className="modal-overlay">
@@ -233,12 +261,12 @@ class UserModal extends Component {
               />
             </div>
 
-            {isEditingRoleChange && (
+            {shouldShowSecondPasswordInput && (
               <div className="form-group">
-                <label style={{color: '#dc2626', fontWeight: 'bold'}}>Mật khẩu cấp 2 (bắt buộc khi thay đổi Admin ↔ Staff)</label>
                 <input
                   type="password"
                   name="adminPassword"
+                  className="second-password-input"
                   value={this.state.adminPassword}
                   onChange={this.handleInputChange}
                   placeholder="Nhập mật khẩu cấp 2"

@@ -182,7 +182,7 @@ class AdminProducts extends Component {
       <AuthGuard>
         <div className="admin-container">
         <AdminSidebar currentPath="/admin/products" />
-        <div className="admin-content">
+        <div className="admin-content product-page">
           {showForm && (
             <ProductForm
               categories={categories}
