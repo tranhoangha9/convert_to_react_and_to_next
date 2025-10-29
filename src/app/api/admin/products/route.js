@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import path from 'path';
+import { unlink } from 'fs/promises';
 
 const prisma = new PrismaClient();
 
@@ -131,6 +133,20 @@ export async function PUT(request) {
       );
     }
 
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: parseInt(id) },
+      select: { image: true }
+    });
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { success: false, error: 'Sản phẩm không tồn tại' },
+        { status: 404 }
+      );
+    }
+
+    const oldImage = existingProduct.image;
+
     const product = await prisma.product.update({
       where: { id: parseInt(id) },
       data: {
@@ -147,6 +163,22 @@ export async function PUT(request) {
         isFeatured: isFeatured !== undefined ? isFeatured : false
       }
     });
+
+    if (oldImage && oldImage.startsWith('/uploads/') && oldImage !== image) {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const uploadDir = isProduction
+        ? '/var/www/nextapp/uploads'
+        : path.join(process.cwd(), 'public', 'uploads');
+
+      const oldFilename = path.basename(oldImage);
+      const oldFilePath = path.join(uploadDir, oldFilename);
+
+      try {
+        await unlink(oldFilePath);
+      } catch (error) {
+        console.warn('Không thể xoá ảnh sản phẩm cũ:', error);
+      }
+    }
 
     return NextResponse.json({
       success: true,

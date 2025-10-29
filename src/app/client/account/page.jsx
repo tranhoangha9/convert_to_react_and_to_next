@@ -117,7 +117,7 @@ class Account extends Component {
 
   handleSaveProfile = async () => {
     try {
-      const { user, firstName, lastName, phone, address, profileImageUrl, newPassword, confirmPassword } = this.state;
+      const { user, firstName, lastName, phone, address, profileImageUrl, newPassword, confirmPassword, email } = this.state;
       
       if (!user) {
         this.setState({ error: 'Không tìm thấy thông tin user' });
@@ -126,6 +126,13 @@ class Account extends Component {
 
       if (!firstName.trim() || !lastName.trim()) {
         this.setState({ error: 'Họ và tên không được để trống' });
+        return;
+      }
+
+      const trimmedEmail = email.trim();
+
+      if (!trimmedEmail) {
+        this.setState({ error: 'Email không được để trống' });
         return;
       }
 
@@ -164,7 +171,8 @@ class Account extends Component {
         name: `${firstName.trim()} ${lastName.trim()}`,
         phone: phone.trim(),
         address: address.trim(),
-        avatar: profileImageUrl
+        avatar: profileImageUrl,
+        email: trimmedEmail
       };
 
       const response = await fetch('/api/client/users/profile', {
@@ -189,7 +197,8 @@ class Account extends Component {
           user: updatedUser,
           error: '',
           newPassword: '',
-          confirmPassword: ''
+          confirmPassword: '',
+          email: trimmedEmail
         });
         
         const message = wantsToChangePassword 
