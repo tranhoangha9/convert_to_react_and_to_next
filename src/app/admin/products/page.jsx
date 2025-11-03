@@ -1,6 +1,7 @@
 'use client';
 import React, { Component } from 'react';
 import '../styles/admin.css';
+import './product.css';
 import AdminSidebar from '../components/AdminSidebar';
 import ProductForm from '../components/ProductForm';
 import ProductTable from '../components/ProductTable';
@@ -217,8 +218,8 @@ class AdminProducts extends Component {
             />
           )}
 
-          <div className="products-controls" style={{marginBottom: '20px', display: 'flex', gap: '16px', alignItems: 'center'}}>
-            <div className="users-search-box" style={{flex: 1}}>
+          <div className="products-controls">
+            <div className="products-search-box">
               <input
                 type="text"
                 placeholder="Search by name, SKU, description..."

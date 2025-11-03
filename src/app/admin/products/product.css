@@ -4,6 +4,48 @@
   margin-bottom: 30px;
 }
 
+.products-controls {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.products-search-box {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.products-search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.products-search-box input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.products-search-box svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  width: 18px;
+  height: 18px;
+}
+
 .admin-container {
   display: flex;
   min-height: 100vh;
