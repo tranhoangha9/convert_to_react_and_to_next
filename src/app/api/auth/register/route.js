@@ -10,7 +10,7 @@ export async function POST(request) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { success: false, error: 'Vui lòng nhập đầy đủ thông tin' },
+        { success: false, error: 'Please fill in all required fields' },
         { status: 400 }
       );
     }
@@ -18,14 +18,14 @@ export async function POST(request) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { success: false, error: 'Email không hợp lệ' },
+        { success: false, error: 'Invalid email address' },
         { status: 400 }
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { success: false, error: 'Mật khẩu phải có ít nhất 6 ký tự' },
+        { success: false, error: 'Password must be at least 6 characters' },
         { status: 400 }
       );
     }
@@ -36,7 +36,7 @@ export async function POST(request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: 'Email đã được sử dụng' },
+        { success: false, error: 'Email is already in use' },
         { status: 400 }
       );
     }
@@ -61,7 +61,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Đăng ký thành công',
+      message: 'Registration successful',
       user: {
         id: user.id,
         name: user.name,
@@ -73,7 +73,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Register error:', error);
     return NextResponse.json(
-      { success: false, error: 'Có lỗi xảy ra khi đăng ký' },
+      { success: false, error: 'An error occurred during registration' },
       { status: 500 }
     );
   } finally {

@@ -112,7 +112,7 @@ class ProductForm extends Component {
           }
         }));
       } else {
-        alert('Lỗi khi upload ảnh: ' + data.error);
+        alert('Error uploading image: ' + data.error);
         this.setState(prevState => ({
           formData: {
             ...prevState.formData,
@@ -122,7 +122,7 @@ class ProductForm extends Component {
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Lỗi khi upload ảnh');
+      alert('Error uploading image');
       this.setState(prevState => ({
         formData: {
           ...prevState.formData,
@@ -220,37 +220,37 @@ class ProductForm extends Component {
                 name="price"
                 value={formData.price}
                 onChange={this.handleInputChange}
-                placeholder="Nhập giá"
+                placeholder="Enter price"
                 step="0.01"
                 required
               />
             </div>
             <div className="form-group">
-              <label>Giá gốc</label>
+              <label>Original Price</label>
               <input
                 type="number"
                 name="originalPrice"
                 value={formData.originalPrice}
                 onChange={this.handleInputChange}
-                placeholder="Nhập giá gốc"
+                placeholder="Enter original price"
                 step="0.01"
               />
             </div>
             <div className="form-group">
-              <label>Số lượng</label>
+              <label>Stock Quantity</label>
               <input
                 type="number"
                 name="stock"
                 value={formData.stock}
                 onChange={this.handleInputChange}
-                placeholder="Nhập số lượng"
+                placeholder="Enter stock quantity"
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Hoặc tải lên hình ảnh</label>
+              <label>Upload Image</label>
               <input
                 type="file"
                 name="imageFile"
@@ -265,36 +265,36 @@ class ProductForm extends Component {
               )}
             </div>
             <div className="form-group">
-              <label>URL hình ảnh</label>
+              <label>Image URL</label>
               <input
                 type="text"
                 name="image"
                 value={formData.image}
                 onChange={this.handleInputChange}
-                placeholder="Nhập URL hình ảnh"
+                placeholder="Enter image URL"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>Mô tả ngắn</label>
+            <label>Short Description</label>
             <input
               type="text"
               name="shortDescription"
               value={formData.shortDescription}
               onChange={this.handleInputChange}
-              placeholder="Nhập mô tả ngắn"
+              placeholder="Enter short description"
             />
           </div>
 
           <div className="form-group">
-            <label>Mô tả chi tiết</label>
+            <label>Detailed Description</label>
             <textarea
               rows="4"
               name="description"
               value={formData.description}
               onChange={this.handleInputChange}
-              placeholder="Nhập mô tả chi tiết"
+              placeholder="Enter detailed description"
             ></textarea>
           </div>
 
@@ -307,7 +307,7 @@ class ProductForm extends Component {
                   checked={formData.isActive}
                   onChange={this.handleInputChange}
                 />
-                <span>Kích hoạt</span>
+                <span>Active</span>
               </label>
             </div>
             <div className="form-group">
@@ -318,7 +318,7 @@ class ProductForm extends Component {
                   checked={formData.isFeatured}
                   onChange={this.handleInputChange}
                 />
-                <span>Nổi bật</span>
+                <span>Featured</span>
               </label>
             </div>
           </div>

@@ -111,7 +111,7 @@ class Checkout extends Component {
     const { information } = this.state;
 
     if (!information.fullName || !information.mobileNumber || !information.state || !information.city) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+      alert('Please fill in all required fields');
       return;
     }
 
@@ -126,19 +126,19 @@ class Checkout extends Component {
     const { information, payment, cartItems, discount, discountCode, discountId } = this.state;
 
     if (cartItems.length === 0) {
-      alert('Giỏ hàng trống!');
+      alert('Your cart is empty!');
       return;
     }
 
     if (!information.fullName || !information.mobileNumber || !information.state || !information.city) {
-      alert('Vui lòng điền đầy đủ thông tin giao hàng');
+      alert('Please complete all shipping information');
       this.setState({ showInformation: true, showPayment: false });
       return;
     }
 
     if (payment.method === 'card') {
       if (!payment.cardNumber || !payment.expiryDate || !payment.cvv || !payment.cardHolderName) {
-        alert('Vui lòng điền đầy đủ thông tin thẻ');
+        alert('Please complete all card details');
         this.setState({ showInformation: false, showPayment: true });
         return;
       }
@@ -151,7 +151,7 @@ class Checkout extends Component {
       const user = getCurrentUser();
 
       if (discount > 0 && (!discountCode || !discountId)) {
-        alert('Không tìm thấy mã giảm giá đã áp dụng. Vui lòng thử áp lại.');
+        alert('Applied discount could not be found. Please try applying it again.');
         return;
       }
 
@@ -186,14 +186,14 @@ class Checkout extends Component {
           sessionStorage.removeItem('cartDiscountId');
         }
 
-        alert('Đặt hàng thành công!');
+        alert('Order placed successfully!');
         window.location.href = `/client/order-success?orderId=${data.orderId}`;
       } else {
-        alert(data.error || 'Có lỗi xảy ra khi đặt hàng');
+        alert(data.error || 'An error occurred while placing the order');
       }
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Có lỗi xảy ra khi đặt hàng');
+      alert('An error occurred while placing the order');
     } finally {
       this.setState({ loading: false });
     }
@@ -213,9 +213,9 @@ class Checkout extends Component {
       return (
         <div className="checkout-container">
           <div className="checkout-empty">
-            <h2>Giỏ hàng trống</h2>
-            <p>Vui lòng thêm sản phẩm vào giỏ hàng trước khi thanh toán</p>
-            <Link href="/" className="btn-continue-shopping">Tiếp tục mua sắm</Link>
+            <h2>Your cart is empty</h2>
+            <p>Please add items to your cart before proceeding to checkout</p>
+            <Link href="/" className="btn-continue-shopping">Continue shopping</Link>
           </div>
         </div>
       );

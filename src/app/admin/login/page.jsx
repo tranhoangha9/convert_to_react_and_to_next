@@ -129,9 +129,6 @@ class AdminLogin extends Component {
           </form>
 
           <div className="admin-login-footer">
-            <p className="demo-info"> <br />
-              admin: tenoteciara@gmail.com || 123123
-            </p>
             <p className="back-link">
               <Link href="/">← Back to homepage</Link>
             </p>

@@ -45,8 +45,8 @@ export async function POST(request) {
     if ((user.role === 'admin' || user.role === 'staff') && !isAdminPortal) {
       return Response.json({
         success: false,
-        error: 'Tài khoản quản trị không thể đăng nhập ở giao diện khách hàng'
-      }, { status: 403 });
+        error: 'Invalid email or password'
+      }, { status: 401 });
     }
 
     let passwordValid = false;

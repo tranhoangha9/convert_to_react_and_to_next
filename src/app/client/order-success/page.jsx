@@ -44,7 +44,7 @@ class OrderSuccess extends Component {
     if (loading) {
       return (
         <div className="order-success-container">
-          <div className="loading">Đang tải thông tin đơn hàng...</div>
+          <div className="loading">Loading order details...</div>
         </div>
       );
     }
@@ -53,8 +53,8 @@ class OrderSuccess extends Component {
       return (
         <div className="order-success-container">
           <div className="error">
-            <h2>Không tìm thấy đơn hàng</h2>
-            <Link href="/client/account" className="btn-primary">Về tài khoản</Link>
+            <h2>Order not found</h2>
+            <Link href="/client/account" className="btn-primary">Back to Account</Link>
           </div>
         </div>
       );
@@ -70,22 +70,22 @@ class OrderSuccess extends Component {
             </svg>
           </div>
 
-          <h1>Đặt hàng thành công!</h1>
-          <p>Cảm ơn bạn đã mua sắm tại cửa hàng chúng tôi.</p>
+          <h1>Order Placed Successfully!</h1>
+          <p>Thank you for shopping with us.</p>
 
           <div className="order-info">
-            <h3>Thông tin đơn hàng</h3>
+            <h3>Order Details</h3>
             <div className="info-row">
-              <span>Mã đơn hàng:</span>
+              <span>Order ID:</span>
               <span>#{order.id}</span>
             </div>
             <div className="info-row">
-              <span>Tổng tiền:</span>
+              <span>Total amount:</span>
               <span>${order.totalAmount}</span>
             </div>
             {order.discount && (
               <div className="info-row">
-                <span>Giảm giá đã áp dụng:</span>
+                <span>Applied discount:</span>
                 <div className="discount-info">
                   <span className="discount-applied">{order.discount.name}</span>
                   <span className="discount-code">({order.discount.code})</span>
@@ -93,18 +93,18 @@ class OrderSuccess extends Component {
               </div>
             )}
             <div className="info-row">
-              <span>Phương thức thanh toán:</span>
-              <span>{order.paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng' : 'Thẻ tín dụng'}</span>
+              <span>Payment method:</span>
+              <span>{order.paymentMethod === 'cod' ? 'Cash on delivery' : 'Credit card'}</span>
             </div>
             <div className="info-row">
-              <span>Trạng thái đơn hàng:</span>
-              <span className="status pending">Đang xử lý</span>
+              <span>Order status:</span>
+              <span className="status pending">Processing</span>
             </div>
           </div>
 
           <div className="order-actions">
-            <Link href="/client/account" className="btn-primary">Xem đơn hàng</Link>
-            <Link href="/" className="btn-secondary">Tiếp tục mua sắm</Link>
+            <Link href="/client/account" className="btn-primary">View order</Link>
+            <Link href="/" className="btn-secondary">Continue shopping</Link>
           </div>
         </div>
       </div>

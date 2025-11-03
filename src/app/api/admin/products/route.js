@@ -65,7 +65,7 @@ export async function POST(request) {
 
     if (!name || !price) {
       return NextResponse.json(
-        { success: false, error: 'Tên và giá sản phẩm là bắt buộc' },
+        { success: false, error: 'Product name and price are required' },
         { status: 400 }
       );
     }
@@ -88,7 +88,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Tạo sản phẩm thành công',
+      message: 'Product created successfully',
       product
     });
   } catch (error) {
@@ -121,14 +121,14 @@ export async function PUT(request) {
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: 'ID sản phẩm là bắt buộc' },
+        { success: false, error: 'Product ID is required' },
         { status: 400 }
       );
     }
 
     if (!name || !price) {
       return NextResponse.json(
-        { success: false, error: 'Tên và giá sản phẩm là bắt buộc' },
+        { success: false, error: 'Product name and price are required' },
         { status: 400 }
       );
     }
@@ -140,7 +140,7 @@ export async function PUT(request) {
 
     if (!existingProduct) {
       return NextResponse.json(
-        { success: false, error: 'Sản phẩm không tồn tại' },
+        { success: false, error: 'Product not found' },
         { status: 404 }
       );
     }
@@ -176,13 +176,13 @@ export async function PUT(request) {
       try {
         await unlink(oldFilePath);
       } catch (error) {
-        console.warn('Không thể xoá ảnh sản phẩm cũ:', error);
+        console.warn('Unable to delete old product image:', error);
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Cập nhật sản phẩm thành công',
+      message: 'Product updated successfully',
       product
     });
   } catch (error) {
@@ -214,7 +214,7 @@ export async function PATCH(request) {
 
     return NextResponse.json({
       success: true,
-      message: `Đã ${isActive ? 'kích hoạt' : 'tắt kích hoạt'} sản phẩm thành công`,
+      message: `Product has been ${isActive ? 'activated' : 'deactivated'} successfully`,
       product
     });
   } catch (error) {
@@ -246,7 +246,7 @@ export async function DELETE(request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Đã tắt kích hoạt sản phẩm thành công'
+      message: 'Product has been deactivated successfully'
     });
   } catch (error) {
     return NextResponse.json(

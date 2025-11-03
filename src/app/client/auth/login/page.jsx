@@ -38,7 +38,7 @@ class Login extends Component {
     this.setState({ loading: true, error: '' });
     if (!username || !password) {
       this.setState({
-        error: 'Vui lòng nhập đầy đủ thông tin',
+        error: 'Please fill in all required fields',
         loading: false
       });
       return;
@@ -77,14 +77,14 @@ class Login extends Component {
         window.location.href = redirectTo;
       } else {
         this.setState({
-          error: data.error || 'Đăng nhập thất bại',
+          error: data.error || 'Login failed',
           loading: false
         });
       }
     } catch (error) {
       console.error('Login error:', error);
       this.setState({
-        error: 'Có lỗi xảy ra khi đăng nhập',
+        error: 'An error occurred during login',
         loading: false
       });
     }
@@ -96,32 +96,32 @@ class Login extends Component {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1>Đăng nhập</h1>
+            <h1>Sign In</h1>
           </div>
 
           <form onSubmit={this.handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="username">Tên đăng nhập</label>
+              <label htmlFor="username">Email</label>
               <input
                 type="text"
                 id="username"
                 name="username"
                 value={username}
                 onChange={this.handleInputChange}
-                placeholder="Nhập tên đăng nhập"
+                placeholder="Enter your email"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Mật khẩu</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={this.handleInputChange}
-                placeholder="Nhập mật khẩu"
+                placeholder="Enter your password"
                 required
               />
             </div>
@@ -137,14 +137,13 @@ class Login extends Component {
               className="auth-button"
               disabled={loading}
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
           <div className="auth-footer">
-            <p>Demo: tranhoangha9@gmail.com ||| 123123123</p>
             <p className="auth-link">
-              Bạn chưa có tài khoản? <Link href="/client/auth/register">Đăng ký tại đây</Link>
+              Don't have an account? <Link href="/client/auth/register">Register here</Link>
             </p>
           </div>
         </div>

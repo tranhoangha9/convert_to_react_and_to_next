@@ -31,7 +31,7 @@ class Register extends Component {
 
     if (!name.trim() || !email.trim() || !password || !confirmPassword) {
       this.setState({ 
-        error: 'Vui lòng nhập đầy đủ thông tin',
+        error: 'Please fill in all required fields',
         loading: false 
       });
       return;
@@ -39,7 +39,7 @@ class Register extends Component {
 
     if (password.length < 6) {
       this.setState({ 
-        error: 'Mật khẩu phải có ít nhất 6 ký tự',
+        error: 'Password must be at least 6 characters',
         loading: false 
       });
       return;
@@ -47,7 +47,7 @@ class Register extends Component {
 
     if (password !== confirmPassword) {
       this.setState({ 
-        error: 'Mật khẩu xác nhận không khớp',
+        error: 'Password confirmation does not match',
         loading: false 
       });
       return;
@@ -56,7 +56,7 @@ class Register extends Component {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       this.setState({ 
-        error: 'Email không hợp lệ',
+        error: 'Invalid email address',
         loading: false 
       });
       return;
@@ -78,18 +78,18 @@ class Register extends Component {
       const data = await response.json();
 
       if (data.success) {
-        alert('Đăng ký thành công!');
+        alert('Registration successful!');
         window.location.href = '/client/auth/login';
       } else {
         this.setState({ 
-          error: data.error || 'Đăng ký thất bại',
+          error: data.error || 'Registration failed',
           loading: false 
         });
       }
     } catch (error) {
       console.error('Register error:', error);
       this.setState({ 
-        error: 'Có lỗi xảy ra khi đăng ký',
+        error: 'An error occurred during registration',
         loading: false 
       });
     }
@@ -102,19 +102,19 @@ class Register extends Component {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1>Đăng ký</h1>
+            <h1>Sign Up</h1>
           </div>
           
           <form onSubmit={this.handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="name">Họ và tên</label>
+              <label htmlFor="name">Full Name</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={name}
                 onChange={this.handleInputChange}
-                placeholder="Nhập họ và tên"
+                placeholder="Enter your full name"
                 required
               />
             </div>
@@ -127,33 +127,33 @@ class Register extends Component {
                 name="email"
                 value={email}
                 onChange={this.handleInputChange}
-                placeholder="Nhập email"
+                placeholder="Enter your email"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Mật khẩu</label>
+              <label htmlFor="password">Password</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={this.handleInputChange}
-                placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                placeholder="Enter password (minimum 6 characters)"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
+              <label htmlFor="confirmPassword">Confirm Password</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={this.handleInputChange}
-                placeholder="Nhập lại mật khẩu"
+                placeholder="Re-enter your password"
                 required
               />
             </div>
@@ -169,13 +169,13 @@ class Register extends Component {
               className="auth-button"
               disabled={loading}
             >
-              {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+              {loading ? 'Signing up...' : 'Sign Up'}
             </button>
           </form>
 
           <div className="auth-footer">
             <p className="auth-link">
-              Đã có tài khoản? <Link href="/client/auth/login">Đăng nhập tại đây</Link>
+              Already have an account? <Link href="/client/auth/login">Log in here</Link>
             </p>
           </div>
         </div>

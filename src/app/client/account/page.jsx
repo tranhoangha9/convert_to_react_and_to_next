@@ -99,14 +99,14 @@ class Account extends Component {
             profileImageUrl: data.imageUrl
           });
         } else {
-          alert('Lỗi khi upload ảnh: ' + data.error);
+          alert('Error uploading image: ' + data.error);
           this.setState({
             profileImageUrl: null
           });
         }
       } catch (error) {
         console.error('Error uploading image:', error);
-        alert('Lỗi khi upload ảnh');
+        alert('Error uploading image');
         this.setState({
           profileImageUrl: null
         });
@@ -120,19 +120,19 @@ class Account extends Component {
       const { user, firstName, lastName, phone, address, profileImageUrl, newPassword, confirmPassword, email } = this.state;
       
       if (!user) {
-        this.setState({ error: 'Không tìm thấy thông tin user' });
+        this.setState({ error: 'User information not found' });
         return;
       }
 
       if (!firstName.trim() || !lastName.trim()) {
-        this.setState({ error: 'Họ và tên không được để trống' });
+        this.setState({ error: 'First and last name are required' });
         return;
       }
 
       const trimmedEmail = email.trim();
 
       if (!trimmedEmail) {
-        this.setState({ error: 'Email không được để trống' });
+        this.setState({ error: 'Email is required' });
         return;
       }
 
@@ -140,12 +140,12 @@ class Account extends Component {
       
       if (wantsToChangePassword) {
         if (newPassword !== confirmPassword) {
-          this.setState({ error: 'Mật khẩu xác nhận không khớp' });
+          this.setState({ error: 'Password confirmation does not match' });
           return;
         }
         
         if (newPassword.length < 6) {
-          this.setState({ error: 'Mật khẩu phải có ít nhất 6 ký tự' });
+          this.setState({ error: 'Password must be at least 6 characters' });
           return;
         }
 
@@ -162,7 +162,7 @@ class Account extends Component {
 
         const passwordData = await passwordResponse.json();
         if (!passwordData.success) {
-          this.setState({ error: passwordData.error || 'Có lỗi xảy ra khi đổi mật khẩu' });
+          this.setState({ error: passwordData.error || 'An error occurred while changing password' });
           return;
         }
       }
@@ -202,15 +202,15 @@ class Account extends Component {
         });
         
         const message = wantsToChangePassword 
-          ? 'Thông tin và mật khẩu đã được cập nhật thành công!' 
-          : 'Thông tin đã được lưu thành công!';
+          ? 'Profile and password updated successfully!' 
+          : 'Profile updated successfully!';
         alert(message);
       } else {
-        this.setState({ error: data.error || 'Có lỗi xảy ra khi lưu thông tin' });
+        this.setState({ error: data.error || 'An error occurred while saving information' });
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      this.setState({ error: 'Có lỗi xảy ra khi lưu thông tin' });
+      this.setState({ error: 'An error occurred while saving information' });
     }
   }
 
@@ -262,7 +262,7 @@ class Account extends Component {
     const { user, profileImageUrl, error } = this.state;
 
     if (!user) {
-      return <div>Đang kiểm tra đăng nhập...</div>;
+      return <div>Checking login status...</div>;
     }
 
     return (
@@ -419,7 +419,7 @@ class Account extends Component {
                 name="newPassword"
                 value={this.state.newPassword}
                 onChange={this.handleInputChange}
-                placeholder="Nhập mật khẩu mới (để trống nếu không đổi)"
+                placeholder="Enter new password (leave blank to keep current)"
               />
             </div>
 
@@ -430,7 +430,7 @@ class Account extends Component {
                 name="confirmPassword"
                 value={this.state.confirmPassword}
                 onChange={this.handleInputChange}
-                placeholder="Nhập lại mật khẩu mới"
+                placeholder="Re-enter new password"
               />
             </div>
 

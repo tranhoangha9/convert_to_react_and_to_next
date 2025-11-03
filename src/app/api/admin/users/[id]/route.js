@@ -19,21 +19,21 @@ export async function PUT(request, { params }) {
     if (!existingUser) {
       return Response.json({
         success: false,
-        error: 'User không tồn tại'
+        error: 'User not found'
       }, { status: 404 })
     }
 
     if (adminUser.role === 'staff') {
       return Response.json({
         success: false,
-        error: 'Bạn không có quyền chỉnh sửa người dùng'
+        error: 'You do not have permission to edit users'
       }, { status: 403 })
     }
 
     if (existingUser.role === 'admin' && adminUser.role !== 'admin') {
       return Response.json({
         success: false,
-        error: 'Bạn không có quyền sửa admin'
+        error: 'You do not have permission to modify an admin'
       }, { status: 403 })
     }
 
@@ -46,14 +46,14 @@ export async function PUT(request, { params }) {
       if (!adminPassword) {
         return Response.json({
           success: false,
-          error: 'Vui lòng nhập mật khẩu cấp 2'
+          error: 'Please enter the secondary password'
         }, { status: 403 })
       }
 
       if (adminPassword !== SECOND_LEVEL_PASSWORD) {
         return Response.json({
           success: false,
-          error: 'Mật khẩu cấp 2 không đúng'
+          error: 'Incorrect secondary password'
         }, { status: 403 })
       }
     }
@@ -83,14 +83,14 @@ export async function PUT(request, { params }) {
     return Response.json({
       success: true,
       user: updatedUser,
-      message: 'Cập nhật user thành công'
+      message: 'User updated successfully'
     })
 
   } catch (error) {
     console.error('Error updating user:', error)
     return Response.json({
       success: false,
-      error: 'Có lỗi xảy ra khi cập nhật user'
+      error: 'An error occurred while updating the user'
     }, { status: 500 })
   }
 }
@@ -110,20 +110,20 @@ export async function DELETE(request, { params }) {
     if (!existingUser) {
       return Response.json({
         success: false,
-        error: 'User không tồn tại'
+        error: 'User not found'
       }, { status: 404 })
     }
 
     if (adminUser.role === 'staff') {
       return Response.json({
         success: false,
-        error: 'Bạn không có quyền xóa người dùng'
+        error: 'You do not have permission to deactivate users'
       }, { status: 403 })
     }
     if (existingUser.role === 'admin') {
       return Response.json({
         success: false,
-        error: 'Không thể xóa admin'
+        error: 'Cannot deactivate an admin'
       }, { status: 403 })
     }
 
@@ -134,14 +134,14 @@ export async function DELETE(request, { params }) {
 
     return Response.json({
       success: true,
-      message: 'Đã tắt kích hoạt user'
+      message: 'User has been deactivated'
     })
 
   } catch (error) {
     console.error('Error deleting user:', error)
     return Response.json({
       success: false,
-      error: 'Có lỗi xảy ra khi xóa user'
+      error: 'An error occurred while deactivating the user'
     }, { status: 500 })
   }
 }

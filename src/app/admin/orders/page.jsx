@@ -17,7 +17,8 @@ class AdminOrders extends Component {
       hasPrev: false,
       searchTerm: '',
       statusFilter: 'all',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      isRefreshing: false
     };
   }
 
@@ -38,7 +39,11 @@ class AdminOrders extends Component {
 
   fetchOrders = async () => {
     try {
-      this.setState({ loading: true });
+      if (this.state.orders.length === 0) {
+        this.setState({ loading: true, isRefreshing: false });
+      } else {
+        this.setState({ isRefreshing: true });
+      }
       const params = new URLSearchParams({
         page: this.state.currentPage.toString(),
         limit: '8',
@@ -59,15 +64,16 @@ class AdminOrders extends Component {
           currentPage: normalizedPage,
           hasNext: pagination.hasNext ?? (normalizedPage < totalPages),
           hasPrev: pagination.hasPrev ?? (normalizedPage > 1),
-          loading: false
+          loading: false,
+          isRefreshing: false
         });
       } else {
-        this.setState({ loading: false });
+        this.setState({ loading: false, isRefreshing: false });
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
       alert('Lỗi khi tải danh sách đơn hàng');
-      this.setState({ loading: false });
+      this.setState({ loading: false, isRefreshing: false });
     }
   };
 
@@ -116,7 +122,8 @@ class AdminOrders extends Component {
       statusFilter,
       hasNext,
       hasPrev,
-      sortOrder
+      sortOrder,
+      isRefreshing
     } = this.state;
 
     if (loading) {
@@ -164,7 +171,7 @@ class AdminOrders extends Component {
 
           <div className="admin-card">
             <h3>Orders Management</h3>
-            <table className="admin-table">
+            <table className="admin-table" aria-busy={isRefreshing}>
               <thead>
                 <tr>
                   <th

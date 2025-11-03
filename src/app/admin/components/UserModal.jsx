@@ -66,33 +66,33 @@ class UserModal extends Component {
     const editingUserId = this.props.user?.id;
 
     if (!name.trim()) {
-      alert('Vui lòng nhập tên');
+      alert('Please enter a name');
       return;
     }
 
     if (!email.trim()) {
-      alert('Vui lòng nhập email');
+      alert('Please enter an email');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('Email không hợp lệ');
+      alert('Invalid email address');
       return;
     }
 
     if (!isEditing && !password) {
-      alert('Vui lòng nhập mật khẩu');
+      alert('Please enter a password');
       return;
     }
 
     if (!isEditing && password && password.length < 6) {
-      alert('Mật khẩu phải có ít nhất 6 ký tự');
+      alert('Password must be at least 6 characters');
       return;
     }
 
     if (phone && phone.trim() && !/^[0-9+\-\s()]+$/.test(phone.trim())) {
-      alert('Số điện thoại không hợp lệ');
+      alert('Invalid phone number');
       return;
     }
 
@@ -102,13 +102,13 @@ class UserModal extends Component {
 
     if (requiresSecondPassword) {
       if (!adminPassword.trim()) {
-        alert('Vui lòng nhập mật khẩu cấp 2');
+        alert('Please enter the secondary password');
         return;
       }
     }
 
     if (isEditing && (originalRole === 'admin' || originalRole === 'staff') && role === 'user') {
-      alert('Không thể chuyển Admin/Staff thành User!');
+      alert('Cannot convert Admin/Staff to User!');
       return;
     }
 
@@ -148,12 +148,12 @@ class UserModal extends Component {
       if (data.success) {
         this.props.onClose();
         this.props.onSuccess();
-        alert(isEditing ? 'Cập nhật người dùng thành công!' : 'Tạo người dùng thành công!');
+        alert(isEditing ? 'User updated successfully!' : 'User created successfully!');
       } else {
-        alert(data.error || 'Có lỗi xảy ra');
+        alert(data.error || 'An error occurred');
       }
     } catch (error) {
-      alert('Lỗi khi lưu người dùng');
+      alert('Error saving user');
     }
   }
 
@@ -269,7 +269,7 @@ class UserModal extends Component {
                   className="second-password-input"
                   value={this.state.adminPassword}
                   onChange={this.handleInputChange}
-                  placeholder="Nhập mật khẩu cấp 2"
+                  placeholder="Enter secondary password"
                   required
                 />
               </div>
