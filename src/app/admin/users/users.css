@@ -120,7 +120,7 @@
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 500px; /* Giảm min-width vì ít cột hơn */
+  min-width: 500px; /* Reduced min-width because there are fewer columns */
 }
 
 .users-table th {

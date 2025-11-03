@@ -46,6 +46,6 @@ export async function GET(request){
     })
   } catch (error) {
     console.error(error);
-    return Response.json({success: false, error: "Lỗi khi tải dữ liệu dashboard"}, {status: 500})
+    return Response.json({success: false, error: "Error loading dashboard data"}, {status: 500})
   }
 }

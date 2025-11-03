@@ -9,21 +9,21 @@ export async function POST(request) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: 'Không có file được upload' },
+        { success: false, error: 'No file uploaded' },
         { status: 400 }
       );
     }
 
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
-        { success: false, error: 'Chỉ cho phép upload file ảnh' },
+        { success: false, error: 'Only image files are allowed' },
         { status: 400 }
       );
     }
 
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
-        { success: false, error: 'Kích thước file quá lớn (tối đa 5MB)' },
+        { success: false, error: 'File size is too large (maximum 5MB)' },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error uploading image:', error);
     return NextResponse.json(
-      { success: false, error: 'Lỗi khi upload ảnh' },
+      { success: false, error: 'Error uploading image' },
       { status: 500 }
     );
   }

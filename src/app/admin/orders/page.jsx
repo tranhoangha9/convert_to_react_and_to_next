@@ -72,7 +72,7 @@ class AdminOrders extends Component {
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
-      alert('Lỗi khi tải danh sách đơn hàng');
+      alert('Error loading orders');
       this.setState({ loading: false, isRefreshing: false });
     }
   };

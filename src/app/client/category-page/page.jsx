@@ -80,13 +80,13 @@ class CategoryPage extends Component {
       console.log('Add to cart result:', success);
 
       if (success) {
-        alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+        alert(`Added "${product.name}" to the cart!`);
       } else {
-        alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+        alert("An error occurred while adding the item to the cart.");
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+      alert("An error occurred while adding the item to the cart.");
     }
   };
 

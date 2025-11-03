@@ -14,7 +14,7 @@ export async function PUT(request) {
     if (newPassword.length < 6) {
       return Response.json({
         success: false,
-        error: 'Password phải nhiều hơn hoặc bằng 6 ký tự'
+        error: 'Password must be at least 6 characters'
       }, { status: 400 });
     }
 
@@ -40,7 +40,7 @@ export async function PUT(request) {
 
     return Response.json({
       success: true,
-      message: 'Cap nhat password thanh cong'
+      message: 'Password updated successfully'
     });
 
   } catch (error) {

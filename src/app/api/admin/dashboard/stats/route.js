@@ -44,7 +44,7 @@ export async function GET(request) {
     console.error('Error fetching dashboard stats:', error);
     return Response.json({
       success: false,
-      error: 'Lỗi khi tải thống kê dashboard'
+      error: 'Error loading dashboard statistics'
     }, { status: 500 })
   }
 }

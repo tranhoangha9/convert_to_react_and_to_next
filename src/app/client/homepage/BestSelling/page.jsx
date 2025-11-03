@@ -27,11 +27,11 @@ class BestSelling extends Component {
       if (data.success) {
         this.setState({ products: data.products });
       } else {
-        this.setState({ error: data.error || 'Không thể tải sản phẩm' });
+        this.setState({ error: data.error || 'Unable to load products' });
       }
     } catch (error) {
       console.error('Error loading products:', error);
-      this.setState({ error: 'Lỗi kết nối mạng' });
+      this.setState({ error: 'Network error' });
     } finally {
       this.setState({ loading: false });
     }
@@ -46,13 +46,13 @@ class BestSelling extends Component {
       console.log('Add to cart result (homepage):', success);
 
       if (success) {
-        alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+        alert(`Added "${product.name}" to the cart!`);
       } else {
-        alert('Có lỗi xảy ra khi thêm vào giỏ hàng!');
+        alert('An error occurred while adding the item to the cart.');
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Có lỗi xảy ra khi thêm vào giỏ hàng!');
+      alert('An error occurred while adding the item to the cart.');
     }
   }
 
@@ -66,7 +66,7 @@ class BestSelling extends Component {
             <h2>New Arrivals</h2>
             <Link href="/client/category-page" className="view-all-btn">View All</Link>
           </div>
-          <div className="loading">Đang tải sản phẩm...</div>
+          <div className="loading">Loading products...</div>
         </section>
       );
     }
@@ -78,7 +78,7 @@ class BestSelling extends Component {
             <h2>New Arrivals</h2>
             <Link href="/client/category-page" className="view-all-btn">View All</Link>
           </div>
-          <div className="error">Lỗi: {error}</div>
+          <div className="error">Error: {error}</div>
         </section>
       );
     }

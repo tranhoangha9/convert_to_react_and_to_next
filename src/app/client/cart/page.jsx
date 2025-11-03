@@ -39,7 +39,7 @@ class Cart extends Component {
     const code = couponInput?.value?.trim();
 
     if (!code) {
-      alert('Vui lòng nhập mã giảm giá');
+      alert('Please enter a discount code');
       return;
     }
 
@@ -76,13 +76,13 @@ class Cart extends Component {
           removeBtn.style.display = 'inline-block';
         }
 
-        alert(`Áp dụng mã giảm giá thành công! Giảm ${data.discount.percentage}%`);
+        alert(`Coupon applied successfully! Discount ${data.discount.percentage}%`);
       } else {
-        alert(data.error || 'Mã giảm giá không hợp lệ');
+        alert(data.error || 'Invalid discount code');
       }
     } catch (error) {
       console.error('Error applying coupon:', error);
-      alert('Có lỗi xảy ra khi áp dụng mã giảm giá');
+      alert('An error occurred while applying the discount code');
     }
   }
 
@@ -152,7 +152,7 @@ class Cart extends Component {
 
     const { cartItems } = this.state;
     if (cartItems.length === 0) {
-      alert('Giỏ hàng trống!');
+      alert('Your cart is empty!');
       return;
     }
 
@@ -266,7 +266,7 @@ class Cart extends Component {
                   disabled={loading}
                   aria-label={loading ? 'Processing order' : 'Proceed to checkout'}
                 >
-                  {loading ? 'Đang xử lý...' : 'Proceed to Checkout'}
+                  {loading ? 'Processing...' : 'Proceed to Checkout'}
                 </button>
                 <Link href="/" className="btn-continue" aria-label="Continue shopping">Continue Shopping</Link>
               </div>

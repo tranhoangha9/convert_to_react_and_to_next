@@ -481,7 +481,7 @@ class Checkout extends Component {
                         onClick={this.handlePlaceOrder}
                         disabled={loading}
                       >
-                        {loading ? 'Đang xử lý...' : 'Place Order'}
+                        {loading ? 'Processing...' : 'Place Order'}
                       </button>
                     </div>
                   </div>

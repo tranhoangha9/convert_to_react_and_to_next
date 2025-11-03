@@ -202,7 +202,7 @@ export async function PATCH(request) {
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: 'ID sản phẩm là bắt buộc' },
+        { success: false, error: 'Product ID is required' },
         { status: 400 }
       );
     }
@@ -234,7 +234,7 @@ export async function DELETE(request) {
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: 'ID sản phẩm là bắt buộc' },
+        { success: false, error: 'Product ID is required' },
         { status: 400 }
       );
     }

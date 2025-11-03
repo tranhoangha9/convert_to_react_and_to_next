@@ -7,7 +7,7 @@ export async function POST(request) {
     if (!code || !subtotal) {
       return Response.json({
         success: false,
-        error: 'Thiếu thông tin'
+        error: 'Missing information'
       }, { status: 400 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(request) {
     if (!discount) {
       return Response.json({
         success: false,
-        error: 'Mã giảm giá không hợp lệ'
+        error: 'Invalid discount code'
       }, { status: 404 });
     }
 
@@ -30,7 +30,7 @@ export async function POST(request) {
     if (Number.isNaN(discountPercentage)) {
       return Response.json({
         success: false,
-        error: 'Giá trị mã giảm giá không hợp lệ'
+        error: 'Invalid discount value'
       }, { status: 400 });
     }
 
@@ -50,7 +50,7 @@ export async function POST(request) {
     console.error('Validate coupon error:', error);
     return Response.json({
       success: false,
-      error: 'Lỗi khi kiểm tra mã giảm giá'
+      error: 'Error validating discount code'
     }, { status: 500 });
   }
 }

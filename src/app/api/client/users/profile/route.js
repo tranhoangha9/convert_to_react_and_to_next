@@ -67,7 +67,7 @@ export async function PUT(request) {
     if (Number.isNaN(parsedUserId)) {
       return Response.json({
         success: false,
-        error: 'User ID không hợp lệ'
+        error: 'Invalid user ID'
       }, { status: 400 });
     }
 
@@ -79,7 +79,7 @@ export async function PUT(request) {
     if (!existingUser) {
       return Response.json({
         success: false,
-        error: 'User không tồn tại'
+        error: 'User not found'
       }, { status: 404 });
     }
 
@@ -98,7 +98,7 @@ export async function PUT(request) {
       if (!newEmail) {
         return Response.json({
           success: false,
-          error: 'Email không được để trống'
+          error: 'Email must not be empty'
         }, { status: 400 });
       }
 
@@ -114,7 +114,7 @@ export async function PUT(request) {
         if (emailInUse) {
           return Response.json({
             success: false,
-            error: 'Email đã được sử dụng'
+            error: 'Email is already in use'
           }, { status: 409 });
         }
       }
@@ -156,7 +156,7 @@ export async function PUT(request) {
       try {
         await unlink(oldFilePath);
       } catch (error) {
-        console.warn('Không thể xoá avatar cũ:', error);
+        console.warn('Unable to delete old avatar:', error);
       }
     }
 

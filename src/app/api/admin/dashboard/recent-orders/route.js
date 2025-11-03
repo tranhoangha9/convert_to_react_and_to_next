@@ -26,7 +26,7 @@ export async function GET(request) {
     console.error('Error fetching recent orders:', error);
     return Response.json({
       success: false,
-      error: 'Lỗi khi tải đơn hàng gần đây'
+      error: 'Error loading recent orders'
     }, { status: 500 })
   }
 }

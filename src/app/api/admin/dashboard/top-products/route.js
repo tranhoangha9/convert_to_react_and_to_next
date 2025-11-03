@@ -48,7 +48,7 @@ export async function GET(request) {
     console.error('Error fetching top products:', error);
     return Response.json({
       success: false,
-      error: 'Lỗi khi tải sản phẩm nổi bật'
+      error: 'Error loading top products'
     }, { status: 500 })
   }
 }

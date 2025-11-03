@@ -53,7 +53,7 @@ export async function POST(request) {
       if (!discountRecord) {
         return Response.json({
           success: false,
-          error: 'Mã giảm giá không hợp lệ'
+          error: 'Invalid discount code'
         }, { status: 400 });
       }
 
@@ -67,11 +67,11 @@ export async function POST(request) {
       });
 
       if (!product || product.stock < item.quantity) {
-        const productName = product?.name || `Sản phẩm #${item.id}`;
+        const productName = product?.name || `Product #${item.id}`;
         const remaining = product?.stock ?? 0;
         return Response.json({
           success: false,
-          error: `Sản phẩm "${productName}" chỉ còn lại ${remaining} sản phẩm`
+          error: `Product "${productName}" has only ${remaining} item(s) left`
         }, { status: 400 });
       }
     }

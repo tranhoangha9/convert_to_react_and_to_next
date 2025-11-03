@@ -17,7 +17,7 @@ export async function POST(request) {
     if (existingUser) {
       return Response.json({
         success: false,
-        error: 'Email đã tồn tại'
+        error: 'Email already exists'
       }, { status: 400 })
     }
 
@@ -48,14 +48,14 @@ export async function POST(request) {
     return Response.json({
       success: true,
       user: newUser,
-      message: 'Tạo user thành công'
+      message: 'User created successfully'
     })
 
   } catch (error) {
     console.error('Error creating user:', error)
     return Response.json({
       success: false,
-      error: 'Có lỗi xảy ra khi tạo user'
+      error: 'An error occurred while creating user'
     }, { status: 500 })
   }
 }
@@ -135,6 +135,6 @@ export async function GET(request) {
         })
     } catch (error) {
         console.error('Error fetching users: ', error);
-        return Response.json({success: false, error: 'Lỗi khi tải danh sách người dùng'}, {status: 500})
+        return Response.json({success: false, error: 'Error loading user list'}, {status: 500})
     }
 }
