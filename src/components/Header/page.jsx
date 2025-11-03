@@ -14,13 +14,24 @@ class Header extends Component {
       searchTerm: '',
       searchResults: [],
       showSearchResults: false,
-      searchLoading: false
+      searchLoading: false,
+      searchError: null
     };
     this.searchTimeout = null;
+    this.activeSearchController = null;
   }
 
   componentDidMount() {
     this.checkAuth();
+  }
+
+  componentWillUnmount() {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    if (this.activeSearchController) {
+      this.activeSearchController.abort();
+    }
   }
 
   checkAuth = () => {
@@ -57,28 +68,66 @@ class Header extends Component {
     }
 
     if (!value.trim()) {
-      this.setState({ searchResults: [], showSearchResults: false });
+      if (this.activeSearchController) {
+        this.activeSearchController.abort();
+        this.activeSearchController = null;
+      }
+      this.setState({ searchResults: [], showSearchResults: false, searchLoading: false, searchError: null });
       return;
     }
 
     this.searchTimeout = setTimeout(async () => {
-      try {
-        this.setState({ searchLoading: true });
-        const response = await fetch(`/api/client/products?search=${encodeURIComponent(value)}&limit=5`);
-        const data = await response.json();
-        
-        if (data.success) {
-          this.setState({ 
-            searchResults: data.products,
-            showSearchResults: true,
-            searchLoading: false
-          });
-        }
-      } catch (error) {
-        console.error('Search error:', error);
-        this.setState({ searchLoading: false });
-      }
+      this.performSearch(value.trim());
     }, 500);
+  }
+
+  performSearch = async (query) => {
+    if (this.activeSearchController) {
+      this.activeSearchController.abort();
+    }
+
+    const controller = new AbortController();
+    this.activeSearchController = controller;
+
+    this.setState({ searchLoading: true, showSearchResults: true, searchError: null });
+
+    try {
+      const response = await fetch(`/api/client/products?search=${encodeURIComponent(query)}&limit=5`, {
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      const data = await response.json();
+
+      if (controller.signal.aborted || this.activeSearchController !== controller) {
+        return;
+      }
+
+      if (data.success) {
+        this.setState({
+          searchResults: data.products,
+          showSearchResults: true,
+          searchLoading: false,
+          searchError: null
+        });
+      } else {
+        throw new Error(data.error || 'Failed to fetch products');
+      }
+    } catch (error) {
+      if (controller.signal.aborted) {
+        return;
+      }
+      console.error('Search error:', error);
+      this.setState({
+        searchResults: [],
+        searchLoading: false,
+        showSearchResults: true,
+        searchError: 'Unable to fetch products. Please try again.'
+      });
+    }
   }
 
   handleSearchFocus = () => {
@@ -99,11 +148,10 @@ class Header extends Component {
       searchResults: [],
       showSearchResults: false
     });
-
   }
 
   render() {
-    const { isMobileMenuOpen, user, isCartOpen, searchTerm, searchResults, showSearchResults, searchLoading } = this.state;
+    const { isMobileMenuOpen, user, isCartOpen, searchTerm, searchResults, showSearchResults, searchLoading, searchError } = this.state;
     
     return (
       <header className="navbar">
@@ -189,6 +237,8 @@ class Header extends Component {
                 }}>
                   {searchLoading ? (
                     <div style={{padding: '16px', textAlign: 'center'}}>Searching...</div>
+                  ) : searchError ? (
+                    <div style={{padding: '16px', textAlign: 'center', color: '#ef4444'}}>{searchError}</div>
                   ) : searchResults.length > 0 ? (
                     searchResults.map(product => (
                       <div 
@@ -224,9 +274,33 @@ class Header extends Component {
                         </div>
                       </div>
                     ))
-                  ) : (
+                  ) : searchTerm.trim().length > 0 ? (
                     <div style={{padding: '16px', textAlign: 'center', color: '#64748b'}}>
                       No products found
+                    </div>
+                  ) : (
+                    <div style={{padding: '16px', textAlign: 'center', color: '#64748b'}}>
+                      Start typing to search products
+                    </div>
+                  )}
+                  {!searchLoading && !searchError && searchResults.length > 0 && (
+                    <div style={{
+                      padding: '12px',
+                      textAlign: 'center',
+                      borderTop: '1px solid #e2e8f0',
+                      backgroundColor: '#f8fafc'
+                    }}>
+                      <Link
+                        href={`/client/category-page?search=${encodeURIComponent(searchTerm.trim())}`}
+                        onClick={() => this.setState({ showSearchResults: false })}
+                        style={{
+                          color: '#1B4B66',
+                          fontWeight: 600,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        View all results
+                      </Link>
                     </div>
                   )}
                 </div>

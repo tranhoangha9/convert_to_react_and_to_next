@@ -14,46 +14,33 @@ export async function GET(request) {
     const skip = (page - 1) * limit;
     
     const where = {
-      isActive: true
+      isActive: true,
+      ...(categoryId ? { categoryId: parseInt(categoryId, 10) || undefined } : {})
     };
-    let products, totalCount;
-    
+
     if (search) {
-      const searchLower = search.toLowerCase();
-      const allProducts = await prisma.product.findMany({
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } },
+        { shortDescription: { contains: search } }
+      ];
+    }
+
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
         where,
-        include: {
-          category: true
-        },
+        skip,
+        take: limit,
         orderBy: {
           createdAt: 'desc'
+        },
+        include: {
+          category: true
         }
-      });
-      
-      const filtered = allProducts.filter(p => 
-        p.name?.toLowerCase().includes(searchLower) ||
-        p.description?.toLowerCase().includes(searchLower) ||
-        p.shortDescription?.toLowerCase().includes(searchLower)
-      );
-      
-      totalCount = filtered.length;
-      products = filtered.slice(skip, skip + limit);
-    } else {
-      [products, totalCount] = await Promise.all([
-        prisma.product.findMany({
-          where,
-          skip,
-          take: limit,
-          orderBy: {
-            createdAt: 'desc'
-          },
-          include: {
-            category: true
-          }
-        }),
-        prisma.product.count({ where })
-      ]);
-    }
+      }),
+      prisma.product.count({ where })
+    ]);
+
     const productsWithDiscount = products.map(product => {
       const price = parseFloat(product.price);
       const originalPrice = product.originalPrice ? parseFloat(product.originalPrice) : null;

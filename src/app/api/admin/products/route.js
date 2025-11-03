@@ -13,42 +13,31 @@ export async function GET(request) {
     const search = searchParams.get('search') || '';
     const skip = (page - 1) * limit;
 
-    let products, totalCount;
+    const where = {};
 
-    if (search) {
-      const searchLower = search.toLowerCase();
-      const allProducts = await prisma.product.findMany({
+    const searchValue = search.trim();
+    if (searchValue) {
+      where.OR = [
+        { name: { contains: searchValue } },
+        { description: { contains: searchValue } },
+        { sku: { contains: searchValue } }
+      ];
+    }
+
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
         include: {
           category: true
         },
         orderBy: {
           id: 'desc'
         }
-      });
-
-      const filtered = allProducts.filter(p =>
-        p.name?.toLowerCase().includes(searchLower) ||
-        p.description?.toLowerCase().includes(searchLower) ||
-        p.sku?.toLowerCase().includes(searchLower)
-      );
-
-      totalCount = filtered.length;
-      products = filtered.slice(skip, skip + limit);
-    } else {
-      [products, totalCount] = await Promise.all([
-        prisma.product.findMany({
-          skip,
-          take: limit,
-          include: {
-            category: true
-          },
-          orderBy: {
-            id: 'desc'
-          }
-        }),
-        prisma.product.count()
-      ]);
-    }
+      }),
+      prisma.product.count({ where })
+    ]);
 
     return NextResponse.json({
       success: true,

@@ -13,40 +13,54 @@ export async function GET(request) {
 
     const skip = (page - 1) * limit;
 
-    let where = {};
+    const where = {};
     if (status !== 'all') {
       where.status = status;
     }
 
-    // Lấy tất cả orders với user info
-    const allOrders = await prisma.order.findMany({
-      where,
-      include: {
-        user: {
-          select: { name: true, phone: true, email: true }
-        },
-        orderItems: {
-          select: { quantity: true }
+    const searchValue = search.trim();
+    if (searchValue) {
+      const searchNumber = parseInt(searchValue, 10);
+      const orConditions = [
+        {
+          user: {
+            OR: [
+              { name: { contains: searchValue } },
+              { email: { contains: searchValue } },
+              { phone: { contains: searchValue } }
+            ]
+          }
         }
-      },
-      orderBy: { id: sortOrder }
-    });
+      ];
 
-    let filteredOrders = allOrders;
-    if (search) {
-      const searchLower = search.toLowerCase();
-      const searchNumber = parseInt(search);
-      
-      filteredOrders = allOrders.filter(order => {
-        const matchId = !isNaN(searchNumber) && order.id === searchNumber;
-        const matchName = order.user?.name?.toLowerCase().includes(searchLower);
-        const matchEmail = order.user?.email?.toLowerCase().includes(searchLower);
-        return matchId || matchName || matchEmail;
-      });
+      if (!isNaN(searchNumber)) {
+        orConditions.push({ id: searchNumber });
+      }
+
+      where.AND = [
+        ...(where.AND || []),
+        { OR: orConditions }
+      ];
     }
 
-    const totalCount = filteredOrders.length;
-    const orders = filteredOrders.slice(skip, skip + limit);
+    const [orders, totalCount] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          user: {
+            select: { name: true, phone: true, email: true }
+          },
+          orderItems: {
+            select: { quantity: true }
+          }
+        },
+        orderBy: { id: sortOrder },
+        skip,
+        take: limit
+      }),
+      prisma.order.count({ where })
+    ]);
+
     const totalPages = Math.ceil(totalCount / limit);
 
     return Response.json({

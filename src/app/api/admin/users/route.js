@@ -75,13 +75,28 @@ export async function GET(request) {
 
         const skip = (page - 1) * limit;
 
-        let baseWhere = {};
+        const baseWhere = {};
         if (roleParam !== 'all') baseWhere.role = roleParam;
         if (roleGroup === 'admins') {
           baseWhere.role = { in: ['admin', 'staff'] };
           baseWhere.isActive = true;
         }
         if (status !== 'all') baseWhere.isActive = status === 'active';
+
+        const where = { ...baseWhere };
+
+        const searchValue = search.trim();
+        if (searchValue) {
+          const orConditions = [
+            { email: { contains: searchValue } },
+            { phone: { contains: searchValue } }
+          ];
+
+          where.AND = [
+            ...(where.AND || []),
+            { OR: orConditions }
+          ];
+        }
 
         const selectedFields = {
           id: true,
@@ -94,39 +109,16 @@ export async function GET(request) {
           createdAt: true
         };
 
-        let users;
-        let totalCount;
-
-        if (search) {
-          const searchLower = search.toLowerCase();
-          const allUsers = await prisma.user.findMany({
-            where: baseWhere,
+        const [users, totalCount] = await Promise.all([
+          prisma.user.findMany({
+            where,
             select: selectedFields,
-            orderBy: { createdAt: 'desc' }
-          });
-
-          const filteredUsers = allUsers.filter(user => (
-            user.email?.toLowerCase().includes(searchLower) ||
-            user.phone?.toLowerCase().includes(searchLower)
-          ));
-
-          totalCount = filteredUsers.length;
-          users = filteredUsers.slice(skip, skip + limit);
-        } else {
-          const [pagedUsers, count] = await Promise.all([
-            prisma.user.findMany({
-              where: baseWhere,
-              select: selectedFields,
-              orderBy: { createdAt: 'desc' },
-              skip,
-              take: limit
-            }),
-            prisma.user.count({ where: baseWhere })
-          ]);
-
-          users = pagedUsers;
-          totalCount = count;
-        }
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit
+          }),
+          prisma.user.count({ where })
+        ]);
 
         const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
