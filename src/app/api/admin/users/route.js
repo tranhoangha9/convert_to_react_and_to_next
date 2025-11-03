@@ -75,40 +75,60 @@ export async function GET(request) {
 
         const skip = (page - 1) * limit;
 
-        let where = {};
-        if (roleParam !== 'all') where.role = roleParam;
+        let baseWhere = {};
+        if (roleParam !== 'all') baseWhere.role = roleParam;
         if (roleGroup === 'admins') {
-          where.role = { in: ['admin', 'staff'] };
-          where.isActive = true;
+          baseWhere.role = { in: ['admin', 'staff'] };
+          baseWhere.isActive = true;
         }
-        if (status !== 'all') where.isActive = status === 'active';
+        if (status !== 'all') baseWhere.isActive = status === 'active';
+
+        const selectedFields = {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          phone: true,
+          address: true,
+          createdAt: true
+        };
+
+        let users;
+        let totalCount;
 
         if (search) {
-            where.OR = [
-                { name: { contains: search, mode: 'insensitive' } },
-                { email: { contains: search, mode: 'insensitive' } }
-            ];
+          const searchLower = search.toLowerCase();
+          const allUsers = await prisma.user.findMany({
+            where: baseWhere,
+            select: selectedFields,
+            orderBy: { createdAt: 'desc' }
+          });
+
+          const filteredUsers = allUsers.filter(user => (
+            user.email?.toLowerCase().includes(searchLower) ||
+            user.phone?.toLowerCase().includes(searchLower)
+          ));
+
+          totalCount = filteredUsers.length;
+          users = filteredUsers.slice(skip, skip + limit);
+        } else {
+          const [pagedUsers, count] = await Promise.all([
+            prisma.user.findMany({
+              where: baseWhere,
+              select: selectedFields,
+              orderBy: { createdAt: 'desc' },
+              skip,
+              take: limit
+            }),
+            prisma.user.count({ where: baseWhere })
+          ]);
+
+          users = pagedUsers;
+          totalCount = count;
         }
 
-        const users = await prisma.user.findMany({
-            where,
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                isActive: true,
-                phone: true,
-                address: true,
-                createdAt: true
-            },
-            orderBy: { createdAt: 'desc' },
-            skip,
-            take: limit
-        });
-
-        const totalCount = await prisma.user.count({ where });
-        const totalPages = Math.ceil(totalCount / limit);
+        const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
         return Response.json({
             success: true,

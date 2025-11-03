@@ -10,21 +10,45 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
+    const search = searchParams.get('search') || '';
     const skip = (page - 1) * limit;
 
-    const [products, totalCount] = await Promise.all([
-      prisma.product.findMany({
-        skip,
-        take: limit,
+    let products, totalCount;
+
+    if (search) {
+      const searchLower = search.toLowerCase();
+      const allProducts = await prisma.product.findMany({
         include: {
           category: true
         },
         orderBy: {
           id: 'desc'
         }
-      }),
-      prisma.product.count()
-    ]);
+      });
+
+      const filtered = allProducts.filter(p =>
+        p.name?.toLowerCase().includes(searchLower) ||
+        p.description?.toLowerCase().includes(searchLower) ||
+        p.sku?.toLowerCase().includes(searchLower)
+      );
+
+      totalCount = filtered.length;
+      products = filtered.slice(skip, skip + limit);
+    } else {
+      [products, totalCount] = await Promise.all([
+        prisma.product.findMany({
+          skip,
+          take: limit,
+          include: {
+            category: true
+          },
+          orderBy: {
+            id: 'desc'
+          }
+        }),
+        prisma.product.count()
+      ]);
+    }
 
     return NextResponse.json({
       success: true,

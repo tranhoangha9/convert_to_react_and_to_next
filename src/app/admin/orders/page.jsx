@@ -20,6 +20,7 @@ class AdminOrders extends Component {
       sortOrder: 'desc',
       isRefreshing: false
     };
+    this.searchTimeout = null;
   }
 
   async componentDidMount() {
@@ -29,7 +30,6 @@ class AdminOrders extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (
       prevState.currentPage !== this.state.currentPage ||
-      prevState.searchTerm !== this.state.searchTerm ||
       prevState.statusFilter !== this.state.statusFilter ||
       prevState.sortOrder !== this.state.sortOrder
     ) {
@@ -37,12 +37,14 @@ class AdminOrders extends Component {
     }
   }
 
-  fetchOrders = async () => {
+  fetchOrders = async (fromSearch = false) => {
     try {
-      if (this.state.orders.length === 0) {
-        this.setState({ loading: true, isRefreshing: false });
-      } else {
-        this.setState({ isRefreshing: true });
+      if (!fromSearch) {
+        if (this.state.orders.length === 0) {
+          this.setState({ loading: true, isRefreshing: false });
+        } else {
+          this.setState({ isRefreshing: true });
+        }
       }
       const params = new URLSearchParams({
         page: this.state.currentPage.toString(),
@@ -99,7 +101,21 @@ class AdminOrders extends Component {
       }
       return { currentPage: nextPage };
     });
-  
+  };
+
+  handleSearchChange = (e) => {
+    const value = e.target.value;
+    this.setState({ searchTerm: value });
+
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      this.setState({ currentPage: 1 }, () => {
+        this.fetchOrders(true);
+      });
+    }, 500);
   };
 
   getStatusBadgeClass = (status) => {
@@ -148,9 +164,9 @@ class AdminOrders extends Component {
             <div className="orders-search-box">
               <input
                 type="text"
-                placeholder="Search by order ID, customer name or email... (coming soon)"
+                placeholder="Search by order ID, customer name or email..."
                 value={searchTerm}
-                readOnly
+                onChange={this.handleSearchChange}
               />
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>

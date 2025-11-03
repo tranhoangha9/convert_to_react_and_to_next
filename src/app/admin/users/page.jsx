@@ -36,19 +36,18 @@ class AdminUsers extends Component {
   async componentDidUpdate(prevProps, prevState) {
     if (
       prevState.currentPage !== this.state.currentPage ||
-      prevState.searchTerm !== this.state.searchTerm ||
       prevState.roleFilter !== this.state.roleFilter ||
       prevState.activeTab !== this.state.activeTab
     ) {
-      if (!this.searchTimeout) {
-        this.fetchUsers();
-      }
+      this.fetchUsers();
     }
   }
 
-  fetchUsers = async () => {
+  fetchUsers = async (fromSearch = false) => {
     try {
-      this.setState({ loading: true });
+      if (!fromSearch) {
+        this.setState({ loading: true });
+      }
 
       let roleParam = this.state.roleFilter;
       if (this.state.activeTab === 'admins') {
@@ -106,18 +105,18 @@ class AdminUsers extends Component {
 
   handleSearchChange = (e) => {
     const value = e.target.value;
+    this.setState({ searchTerm: value });
 
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
 
     this.searchTimeout = setTimeout(() => {
-      this.setState({
-        searchTerm: value,
-        currentPage: 1
+      this.setState({ currentPage: 1 }, () => {
+        this.fetchUsers(true);
       });
       this.searchTimeout = null;
-    }, 2000);
+    }, 500);
   };
 
   handleRoleFilterChange = (e) => {
@@ -132,10 +131,15 @@ class AdminUsers extends Component {
   };
 
   handleTabChange = (tab) => {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
     this.setState({
       activeTab: tab,
       currentPage: 1,
-      roleFilter: 'all'
+      roleFilter: 'all',
+      searchTerm: ''
     });
   };
 
@@ -252,7 +256,7 @@ class AdminUsers extends Component {
               <div className="users-search-box">
                 <input
                   type="text"
-                  placeholder="Search by name, email..."
+                  placeholder="Search by email or phone"
                   value={searchTerm}
                   onChange={this.handleSearchChange}
                 />

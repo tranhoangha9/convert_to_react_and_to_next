@@ -14,8 +14,10 @@ class AdminProducts extends Component {
       products: [],
       loading: false,
       showForm: false,
-      editingProduct: null
+      editingProduct: null,
+      searchTerm: ''
     };
+    this.searchTimeout = null;
   }
 
   async componentDidMount() {
@@ -42,10 +44,17 @@ class AdminProducts extends Component {
     }
   };
 
-  fetchProducts = async () => {
+  fetchProducts = async (fromSearch = false) => {
     try {
-      this.setState({ loading: true });
-      const response = await fetch('/api/admin/products');
+      if (!fromSearch) {
+        this.setState({ loading: true });
+      }
+      const { searchTerm } = this.state;
+      let url = '/api/admin/products';
+      if (searchTerm) {
+        url += `?search=${encodeURIComponent(searchTerm)}`;
+      }
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.success) {
@@ -162,8 +171,21 @@ class AdminProducts extends Component {
     }
   };
 
+  handleSearchChange = (e) => {
+    const value = e.target.value;
+    this.setState({ searchTerm: value });
+
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      this.fetchProducts(true);
+    }, 500);
+  };
+
   render() {
-    const { categories, products, loading, showForm, editingProduct } = this.state;
+    const { categories, products, loading, showForm, editingProduct, searchTerm } = this.state;
 
     if (loading && !showForm) {
       return (
@@ -194,6 +216,21 @@ class AdminProducts extends Component {
               loading={loading}
             />
           )}
+
+          <div className="products-controls" style={{marginBottom: '20px', display: 'flex', gap: '16px', alignItems: 'center'}}>
+            <div className="users-search-box" style={{flex: 1}}>
+              <input
+                type="text"
+                placeholder="Search by name, SKU, description..."
+                value={searchTerm}
+                onChange={this.handleSearchChange}
+              />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+            </div>
+          </div>
 
           <div className="admin-card admin-card-with-margin">
             <div className="admin-card-header">

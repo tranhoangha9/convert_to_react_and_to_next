@@ -10,8 +10,13 @@ class Header extends Component {
     this.state = {
       isMobileMenuOpen: false,
       user: null,
-      isCartOpen: false
+      isCartOpen: false,
+      searchTerm: '',
+      searchResults: [],
+      showSearchResults: false,
+      searchLoading: false
     };
+    this.searchTimeout = null;
   }
 
   componentDidMount() {
@@ -43,8 +48,62 @@ class Header extends Component {
     }));
   }
 
+  handleSearchChange = (e) => {
+    const value = e.target.value;
+    this.setState({ searchTerm: value });
+
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    if (!value.trim()) {
+      this.setState({ searchResults: [], showSearchResults: false });
+      return;
+    }
+
+    this.searchTimeout = setTimeout(async () => {
+      try {
+        this.setState({ searchLoading: true });
+        const response = await fetch(`/api/client/products?search=${encodeURIComponent(value)}&limit=5`);
+        const data = await response.json();
+        
+        if (data.success) {
+          this.setState({ 
+            searchResults: data.products,
+            showSearchResults: true,
+            searchLoading: false
+          });
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        this.setState({ searchLoading: false });
+      }
+    }, 500);
+  }
+
+  handleSearchFocus = () => {
+    if (this.state.searchResults.length > 0) {
+      this.setState({ showSearchResults: true });
+    }
+  }
+
+  handleSearchBlur = () => {
+    setTimeout(() => {
+      this.setState({ showSearchResults: false });
+    }, 200);
+  }
+
+  handleProductClick = (productId) => {
+    this.setState({ 
+      searchTerm: '',
+      searchResults: [],
+      showSearchResults: false
+    });
+
+  }
+
   render() {
-    const { isMobileMenuOpen, user, isCartOpen } = this.state;
+    const { isMobileMenuOpen, user, isCartOpen, searchTerm, searchResults, showSearchResults, searchLoading } = this.state;
     
     return (
       <header className="navbar">
@@ -93,7 +152,7 @@ class Header extends Component {
             </div>
           </nav>
           <div className="nav-right">
-            <div className="search-box">
+            <div className="search-box" style={{position: 'relative'}}>
               <span className="search-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                   xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" clipRule="evenodd"
@@ -104,7 +163,74 @@ class Header extends Component {
                     fill="#13101E" />
                 </svg>
               </span>
-              <input type="text" placeholder="Search for products or brands" />
+              <input 
+                type="text" 
+                placeholder="Search for products or brands" 
+                value={searchTerm}
+                onChange={this.handleSearchChange}
+                onFocus={this.handleSearchFocus}
+                onBlur={this.handleSearchBlur}
+              />
+              
+              {showSearchResults && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  backgroundColor: 'white',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  marginTop: '8px',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                  zIndex: 1000,
+                  maxHeight: '400px',
+                  overflowY: 'auto'
+                }}>
+                  {searchLoading ? (
+                    <div style={{padding: '16px', textAlign: 'center'}}>Searching...</div>
+                  ) : searchResults.length > 0 ? (
+                    searchResults.map(product => (
+                      <div 
+                        key={product.id}
+                        onClick={() => this.handleProductClick(product.id)}
+                        style={{
+                          display: 'flex',
+                          padding: '12px',
+                          borderBottom: '1px solid #f1f5f9',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                      >
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          style={{
+                            width: '60px',
+                            height: '60px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            marginRight: '12px'
+                          }}
+                        />
+                        <div style={{flex: 1}}>
+                          <div style={{fontWeight: '500', marginBottom: '4px'}}>{product.name}</div>
+                          <div style={{fontSize: '14px', color: '#64748b'}}>{product.brand}</div>
+                          <div style={{fontSize: '16px', fontWeight: '600', color: '#1B4B66', marginTop: '4px'}}>
+                            ${product.price}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{padding: '16px', textAlign: 'center', color: '#64748b'}}>
+                      No products found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="nav-icons">

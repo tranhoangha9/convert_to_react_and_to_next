@@ -18,30 +18,35 @@ export async function GET(request) {
       where.status = status;
     }
 
-    if (search) {
-      const searchNumber = parseInt(search);
-      where.OR = [
-        { customerInfo: { contains: search, mode: 'insensitive' } },
-        ...(isNaN(searchNumber) ? [] : [{ id: searchNumber }])
-      ];
-    }
-
-    const orders = await prisma.order.findMany({
+    // Lấy tất cả orders với user info
+    const allOrders = await prisma.order.findMany({
       where,
       include: {
         user: {
-          select: { name: true, phone: true }
+          select: { name: true, phone: true, email: true }
         },
         orderItems: {
           select: { quantity: true }
         }
       },
-      orderBy: { id: sortOrder },
-      skip,
-      take: limit
+      orderBy: { id: sortOrder }
     });
 
-    const totalCount = await prisma.order.count({ where });
+    let filteredOrders = allOrders;
+    if (search) {
+      const searchLower = search.toLowerCase();
+      const searchNumber = parseInt(search);
+      
+      filteredOrders = allOrders.filter(order => {
+        const matchId = !isNaN(searchNumber) && order.id === searchNumber;
+        const matchName = order.user?.name?.toLowerCase().includes(searchLower);
+        const matchEmail = order.user?.email?.toLowerCase().includes(searchLower);
+        return matchId || matchName || matchEmail;
+      });
+    }
+
+    const totalCount = filteredOrders.length;
+    const orders = filteredOrders.slice(skip, skip + limit);
     const totalPages = Math.ceil(totalCount / limit);
 
     return Response.json({
