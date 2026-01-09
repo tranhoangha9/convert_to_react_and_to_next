@@ -14,7 +14,7 @@
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
-    "next": "15.5.4",
+    "next": "15.5.9",
     "prisma": "^6.18.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
